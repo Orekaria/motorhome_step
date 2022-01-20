@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "platformIO",
+		},
+		{
+			"path": "proteus"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"platformio": true,
+			"proteus": true,
+			"Project Backups": true,
+			".pio": true,
+			".vscode": false,
+		}
+	}
+}
