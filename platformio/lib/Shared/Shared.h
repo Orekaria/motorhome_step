@@ -9,8 +9,8 @@
 #define INTERRUPT_MPU6050_PIN 2 // pin used for waking up when MPU6050 detects motion
 #define BUZZER_PIN 12 // pin used for waking up
 
-#define MOT_THR_SELECTED 2 // motion is detected when any of the accelerometer messures exceeds these threshold
-#define MOT_DUR_SELECTED 50 // ms that the motion must continue before the interrupt is raised
+#define MOT_THR_SELECTED 4 // motion is detected when any of the accelerometer messures exceeds these threshold
+#define MOT_DUR_SELECTED 200 // ms that the motion must continue before the interrupt is raised
 
 #ifdef DEBUG
 #define LOG(x) Serial.print(x); Serial.flush();

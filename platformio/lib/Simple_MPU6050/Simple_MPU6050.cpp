@@ -435,16 +435,17 @@ Simple_MPU6050 & Simple_MPU6050::load_DMP_Image(uint8_t CalibrateMode) {
 	}
 	resetOffset();									// Load Calibration offset values into MPU
 	if(CalibrateMode)return *this;
-	PrintActiveOffsets();
-	AKM_Init();
-	MPUi2cWriteByte(0x6A, 0xC0);					// 1100 1100 USER_CTRL: Enable FIFO and Reset FIFO
-	MPUi2cWriteByte(0x38, 0x02);					// 0000 0010 INT_ENABLE: RAW_DMP_INT_EN on
-	dmp_on = 1;
-#ifdef interruptPin
-    Interupt_Attach_Function
-#endif
-	//These are the features the above code initialized for you by default (ToDo Allow removal of one or more Features)
-	dmp_features = DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_RAW_GYRO |  DMP_FEATURE_SEND_CAL_GYRO; // These are Fixed into the DMP_Image and Can't be change easily at this time.
+// Orekaria: we (probably) do not want to execute further
+// 	PrintActiveOffsets();
+// 	AKM_Init();
+// 	MPUi2cWriteByte(0x6A, 0xC0);					// 1100 1100 USER_CTRL: Enable FIFO and Reset FIFO
+// 	MPUi2cWriteByte(0x38, 0x02);					// 0000 0010 INT_ENABLE: RAW_DMP_INT_EN on
+// 	dmp_on = 1;
+// #ifdef interruptPin
+//     Interupt_Attach_Function
+// #endif
+// 	//These are the features the above code initialized for you by default (ToDo Allow removal of one or more Features)
+// 	dmp_features = DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_RAW_GYRO |  DMP_FEATURE_SEND_CAL_GYRO; // These are Fixed into the DMP_Image and Can't be change easily at this time.
 	return *this;
 }
 
