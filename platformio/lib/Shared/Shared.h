@@ -2,7 +2,8 @@
 
 // #define DEBUG // uncomment to activate DEBUG mode
 
-#define SERIAL_SPEED (uint32_t) 115200 // Serial monitor speed. Set the same value in platformio.ini
+#define SERIAL_SPEED (uint32_t) 9600 // Serial monitor speed. Set the same value in platformio.ini
+
 #define CARRIAGE_RETURN (String) "\n\r"
 
 #define INTERRUPT_BUTTONS_PIN 3 // Arduino nano pin 2 and 3 can be selected

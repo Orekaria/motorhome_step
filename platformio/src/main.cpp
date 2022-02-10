@@ -5,7 +5,7 @@
 #include <LowPower.h>
 #include <Shared.h>
 #include <Mpu6050.h>
-// #include <Thermostat.h>
+#include <PowerConsumption.h>
 
 enum class DStates {
    NA,
@@ -62,6 +62,8 @@ void resetIsMotionDetected() {
    _isMotionDetected = false;
 }
 
+PowerConsumption powerConsumtion = PowerConsumption();
+
 void motionDetection(DStates onOrOff) {
    switch (onOrOff) {
    case DStates::ON:
@@ -76,7 +78,7 @@ void motionDetection(DStates onOrOff) {
       //// MPU-6050
       // join I2C bus (I2Cdev library doesn't do this automatically)
       Wire.begin();
-      Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+      Wire.setClock((long int)powerConsumtion.currentCPUSpeed * 400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
       // Setup the MPU
       mpu.Set_DMP_Output_Rate_Hz(10);           // Set the DMP output rate from 200Hz to 5 Minutes.
       //mpu.Set_DMP_Output_Rate_Seconds(10);   // Set the DMP output rate in Seconds
@@ -118,7 +120,7 @@ void openCloseStep(DStates openOrClose) {
          isAutocloseActivated = true;
       } else {
          startTimeAutoClose = millis(); // restart the timer if the open-step switch is pressed again
-         if (millis() - startTime > STEP_TIME && millis() - startTime < STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW) { // ... if the user has push the button after the step has opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
+         if (millis() - startTime > powerConsumtion.toCPUTime(STEP_TIME) && millis() - startTime < powerConsumtion.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW)) { // ... if the user has push the button after the step has opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
             if (isAutocloseActivated) {
                isAutocloseActivated = false;
                motionDetection(DStates::ON); // motion activation is activated when the step is permanently extended
@@ -161,7 +163,7 @@ void checkUserInput() {
 void doDelayedActions() {
    if (isInAction) { // if the step is being opened/closed
       LOG(".");
-      if ((millis() - startTime) > STEP_TIME) { // ... and the time to open/close has expired
+      if ((millis() - startTime) > powerConsumtion.toCPUTime(STEP_TIME)) { // ... and the time to open/close has expired
          LOG("isInAction expired" + CARRIAGE_RETURN);
          isInAction = false;
          // release both relays
@@ -169,7 +171,7 @@ void doDelayedActions() {
          digitalWrite(RELAY_CLOSE_PIN, HIGH);
       }
    } else if (isAutocloseActivated) {
-      if ((millis() - startTimeAutoClose) > AUTO_CLOSE_AFTER) { // if the elapsed time has ended, auto-close the step
+      if ((millis() - powerConsumtion.toCPUTime(startTimeAutoClose)) > powerConsumtion.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
          LOG("isInAction auto-CLOSE" + CARRIAGE_RETURN);
          openCloseStep(DStates::CLOSE);
          isAutocloseActivated = false;
@@ -218,10 +220,7 @@ void loop() {
 }
 
 void setup() {
-#ifdef DEBUG
-   Serial.begin(SERIAL_SPEED);
-   LOG("Serial initialized" + CARRIAGE_RETURN);
-#endif
+   powerConsumtion.low(); // at 3.3V, it is recommended to lower the speed of the CPU. timers must be adjusted.
 
    pinMode(SWITCH_OPEN_PIN, INPUT_PULLUP);
    pinMode(SWITCH_CLOSE_PIN, INPUT_PULLUP);
