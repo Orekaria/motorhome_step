@@ -7,7 +7,7 @@ PowerConsumption::PowerConsumption() {
 PowerConsumption::~PowerConsumption() {
 };
 
-void PowerConsumption::changeCPUSpeed(CPUSpeed newCPUSpeed) {
+void PowerConsumption::setCPUSpeed(CPUSpeed newCPUSpeed) {
     if (currentCPUSpeed == newCPUSpeed) {
         return;
     }
@@ -36,11 +36,11 @@ void PowerConsumption::changeCPUSpeed(CPUSpeed newCPUSpeed) {
 }
 
 void PowerConsumption::high() {
-    this->changeCPUSpeed(CPUSpeed::Mhz16);
+    this->setCPUSpeed(CPUSpeed::Mhz16);
 }
 
 void PowerConsumption::low() {
-    this->changeCPUSpeed(CPUSpeed::Mhz8);
+    this->setCPUSpeed(CPUSpeed::Mhz8);
 }
 
 uint32_t PowerConsumption::toCPUTime(uint32_t timeToAdjust) {
