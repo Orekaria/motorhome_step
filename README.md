@@ -32,6 +32,11 @@
   - High efficiency switch regulators for 3.3V and 5V are used
   - Leds and regulators have been removed
 
+### How it lowers power usage:
+Arduino is in sleep until an interrupt is fired (button pressed or motion detected)
+After the step has been opened/closed, it goes back to sleep
+MPU-6050 is powered up only when the step is permanently opened using the internal DMP (Digital Motion Procesor), which does not require the Arduino to poll data and which fires an interruption when it detects motion. Sensibility can be adjusted in the Shared.h file
+
 ## possible alternatives/improvements
 - Use a SW-420 motion sensor instead of the MPU-6050
 - Use an Arduino Pro Micro
@@ -46,3 +51,6 @@
 
 I2Cdev: https://www.i2cdevlib.com/usage
 Relay, NPN transistor: https://www.inventable.eu/controlar-rele-con-transistor/
+MPU-6050:
+  - DMP vs complementary filter: https://www.youtube.com/watch?v=2t-5CCyPJ74&ab_channel=geekmomprojects
+  - Promising library: https://github.com/rambo/I2C. I would like to replace I2Cdev and FastWire with it, if i could find more information and would have a lot more energy to spend in this topic
