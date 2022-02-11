@@ -1,6 +1,6 @@
 // global variables
 
-// #define DEBUG // uncomment to activate DEBUG mode
+#define DEBUG // uncomment to activate DEBUG mode
 
 #define SERIAL_SPEED (uint32_t) 9600 // Serial monitor speed. Set the same value in platformio.ini
 
@@ -14,9 +14,9 @@
 #define MOT_DUR_SELECTED 200 // ms that the motion must continue before the interrupt is raised
 
 #ifdef DEBUG
-#define LOG(x) Serial.print(x); Serial.flush();
+#define LOG(s) Serial.print(s); Serial.flush();
 #else
-#define LOG(x)
+#define LOG(s)
 #endif
 
 //when nothing connected to AD0 then address is 0x68
