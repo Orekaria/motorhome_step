@@ -22,12 +22,18 @@
   ===============================================
 */
 
-#include <Wire.h>
 #include <I2Cdev.h>
 #include "DMP_Image.h"
 #include "Simple_MPU6050.h"
 #include "MPU_ReadMacros.h"
 #include "MPU_WriteMacros.h"
+
+// #define DEBUG // uncomment to activate DEBUG mode
+#ifdef DEBUG
+#define LOG(s) Serial.print(s); Serial.flush();
+#else
+#define LOG(s)
+#endif
 
 //#define USE_OLD_GETYAWPITCHROLL // Calculation returns different values but possibly relevant for your project Try both out
 // OLD Yaw +- 180, Pitch and Roll +- 90 (Peaks at 90 deg then fall back to zero, shows Negative when pointing down pitch and left roll)
@@ -526,8 +532,8 @@ Simple_MPU6050& Simple_MPU6050::load_firmware(uint16_t  length, const uint8_t* f
 		}
 		for (uint16_t c = 0; c < this_write; c++) {
 			Serial.print(F(" 0x"));
-			Serial.print(Num >> 4, HEX); //Prints 0 insted of nothing when byte is less than 8
-			Serial.print(Num & 0X0F, HEX); // Prints the remainder of the hex number
+			Serial.print(bankNum >> 4, HEX); //Prints 0 insted of nothing when byte is less than 8
+			Serial.print(bankNum & 0X0F, HEX); // Prints the remainder of the hex number
 			Serial.print(F(","));
 		}
 		Serial.println();
