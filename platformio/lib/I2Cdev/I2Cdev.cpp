@@ -50,43 +50,43 @@ THE SOFTWARE.
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE
 
-#ifdef I2CDEV_IMPLEMENTATION_WARNINGS
-#if ARDUINO < 100
-#warning Using outdated Arduino IDE with Wire library is functionally limiting.
-#warning Arduino IDE v1.6.5 + with I2Cdev Fastwire implementation is recommended.
-#warning This I2Cdev implementation does not support:
-#warning - Repeated starts conditions
-#warning - Timeout detection(some Wire requests block forever)
-#elif ARDUINO == 100
-#warning Using outdated Arduino IDE with Wire library is functionally limiting.
-#warning Arduino IDE v1.6.5 + with I2Cdev Fastwire implementation is recommended.
-#warning This I2Cdev implementation does not support:
-#warning - Repeated starts conditions
-#warning - Timeout detection(some Wire requests block forever)
-#elif ARDUINO > 100
-/*#warning Using current Arduino IDE with Wire library is functionally limiting.
-#warning Arduino IDE v1.6.5+ with I2CDEV_BUILTIN_FASTWIRE implementation is recommended.
-#warning This I2Cdev implementation does not support:
-#warning - Timeout detection (some Wire requests block forever)*/
-#endif
-#endif
+    #ifdef I2CDEV_IMPLEMENTATION_WARNINGS
+        #if ARDUINO < 100
+            #warning Using outdated Arduino IDE with Wire library is functionally limiting.
+            #warning Arduino IDE v1.6.5+ with I2Cdev Fastwire implementation is recommended.
+            #warning This I2Cdev implementation does not support:
+            #warning - Repeated starts conditions
+            #warning - Timeout detection (some Wire requests block forever)
+        #elif ARDUINO == 100
+            #warning Using outdated Arduino IDE with Wire library is functionally limiting.
+            #warning Arduino IDE v1.6.5+ with I2Cdev Fastwire implementation is recommended.
+            #warning This I2Cdev implementation does not support:
+            #warning - Repeated starts conditions
+            #warning - Timeout detection (some Wire requests block forever)
+        #elif ARDUINO > 100
+            /*#warning Using current Arduino IDE with Wire library is functionally limiting.
+            #warning Arduino IDE v1.6.5+ with I2CDEV_BUILTIN_FASTWIRE implementation is recommended.
+            #warning This I2Cdev implementation does not support:
+            #warning - Timeout detection (some Wire requests block forever)*/
+        #endif
+    #endif
 
 #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
 
-//#error The I2CDEV_BUILTIN_FASTWIRE implementation is known to be broken right now. Patience, Iago!
+    //#error The I2CDEV_BUILTIN_FASTWIRE implementation is known to be broken right now. Patience, Iago!
 
 #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE
 
-#ifdef I2CDEV_IMPLEMENTATION_WARNINGS
-#warning Using I2CDEV_BUILTIN_NBWIRE implementation may adversely affect interrupt detection.
-#warning This I2Cdev implementation does not support:
-#warning - Repeated starts conditions
-#endif
+    #ifdef I2CDEV_IMPLEMENTATION_WARNINGS
+        #warning Using I2CDEV_BUILTIN_NBWIRE implementation may adversely affect interrupt detection.
+        #warning This I2Cdev implementation does not support:
+        #warning - Repeated starts conditions
+    #endif
 
-// NBWire implementation based heavily on code by Gene Knight <Gene@Telobot.com>
-// Originally posted on the Arduino forum at http://arduino.cc/forum/index.php/topic,70705.0.html
-// Originally offered to the i2cdevlib project at http://arduino.cc/forum/index.php/topic,68210.30.html
-TwoWire Wire;
+    // NBWire implementation based heavily on code by Gene Knight <Gene@Telobot.com>
+    // Originally posted on the Arduino forum at http://arduino.cc/forum/index.php/topic,70705.0.html
+    // Originally offered to the i2cdevlib project at http://arduino.cc/forum/index.php/topic,68210.30.html
+    TwoWire Wire;
 
 #endif
 
@@ -103,7 +103,7 @@ I2Cdev::I2Cdev() {
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Status of read operation (true = success)
  */
-int8_t I2Cdev::readBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t* data, uint16_t timeout, void* wireObj) {
+int8_t I2Cdev::readBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t *data, uint16_t timeout, void *wireObj) {
     uint8_t b;
     uint8_t count = readByte(devAddr, regAddr, &b, timeout, wireObj);
     *data = b & (1 << bitNum);
@@ -118,7 +118,7 @@ int8_t I2Cdev::readBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Status of read operation (true = success)
  */
-int8_t I2Cdev::readBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t* data, uint16_t timeout, void* wireObj) {
+int8_t I2Cdev::readBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t *data, uint16_t timeout, void *wireObj) {
     uint16_t b;
     uint8_t count = readWord(devAddr, regAddr, &b, timeout, wireObj);
     *data = b & (1 << bitNum);
@@ -134,7 +134,7 @@ int8_t I2Cdev::readBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Status of read operation (true = success)
  */
-int8_t I2Cdev::readBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t* data, uint16_t timeout, void* wireObj) {
+int8_t I2Cdev::readBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t *data, uint16_t timeout, void *wireObj) {
     // 01101001 read byte
     // 76543210 bit numbers
     //    xxx   args: bitStart=4, length=3
@@ -159,7 +159,7 @@ int8_t I2Cdev::readBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Status of read operation (1 = success, 0 = failure, -1 = timeout)
  */
-int8_t I2Cdev::readBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t* data, uint16_t timeout, void* wireObj) {
+int8_t I2Cdev::readBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t *data, uint16_t timeout, void *wireObj) {
     // 1101011001101001 read byte
     // fedcba9876543210 bit numbers
     //    xxx           args: bitStart=12, length=3
@@ -183,7 +183,7 @@ int8_t I2Cdev::readBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uin
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Status of read operation (true = success)
  */
-int8_t I2Cdev::readByte(uint8_t devAddr, uint8_t regAddr, uint8_t* data, uint16_t timeout, void* wireObj) {
+int8_t I2Cdev::readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, uint16_t timeout, void *wireObj) {
     return readBytes(devAddr, regAddr, 1, data, timeout, wireObj);
 }
 
@@ -194,7 +194,7 @@ int8_t I2Cdev::readByte(uint8_t devAddr, uint8_t regAddr, uint8_t* data, uint16_
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Status of read operation (true = success)
  */
-int8_t I2Cdev::readWord(uint8_t devAddr, uint8_t regAddr, uint16_t* data, uint16_t timeout, void* wireObj) {
+int8_t I2Cdev::readWord(uint8_t devAddr, uint8_t regAddr, uint16_t *data, uint16_t timeout, void *wireObj) {
     return readWords(devAddr, regAddr, 1, data, timeout, wireObj);
 }
 
@@ -206,32 +206,116 @@ int8_t I2Cdev::readWord(uint8_t devAddr, uint8_t regAddr, uint16_t* data, uint16
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Number of bytes read (-1 indicates failure)
  */
-int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t* data, uint16_t timeout, void* wireObj) {
+int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout, void *wireObj) {
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print("I2C (0x");
+        Serial.print(devAddr, HEX);
+        Serial.print(") reading ");
+        Serial.print(length, DEC);
+        Serial.print(" bytes from 0x");
+        Serial.print(regAddr, HEX);
+        Serial.print("...");
+    #endif
+
     int8_t count = 0;
     uint32_t t1 = millis();
 
-    TwoWire* useWire = &Wire;
-    if (wireObj) useWire = (TwoWire*)wireObj;
-    // Arduino v1.0.1+, Wire library
-    // Adds official support for repeated start condition, yay!
+    #if (I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE)
+        TwoWire *useWire = &Wire;
+        if (wireObj) useWire = (TwoWire *)wireObj;
 
-    // I2C/TWI subsystem uses internal buffer that breaks with large data requests
-    // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
-    // smaller chunks instead of all at once
-    for (int k = 0; k < length; k += min((int)length, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
-        useWire->beginTransmission(devAddr);
-        useWire->write(regAddr);
-        useWire->endTransmission();
-        useWire->beginTransmission(devAddr);
-        useWire->requestFrom((uint8_t)devAddr, (uint8_t)min((int)length - k, I2CDEVLIB_WIRE_BUFFER_LENGTH));
+        #if (ARDUINO < 100)
+            // Arduino v00xx (before v1.0), Wire library
 
-        for (; useWire->available() && (timeout == 0 || millis() - t1 < timeout); count++) {
-            data[count] = useWire->read();
+            // I2C/TWI subsystem uses internal buffer that breaks with large data requests
+            // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
+            // smaller chunks instead of all at once
+            for (int k = 0; k < length; k += min((int)length, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
+                useWire->beginTransmission(devAddr);
+                useWire->send(regAddr);
+                useWire->endTransmission();
+                useWire->beginTransmission(devAddr);
+                useWire->requestFrom((uint8_t)devAddr, (uint8_t)min((int)length - k, I2CDEVLIB_WIRE_BUFFER_LENGTH));
+
+                for (; useWire->available() && (timeout == 0 || millis() - t1 < timeout); count++) {
+                    data[count] = useWire->receive();
+                    #ifdef I2CDEV_SERIAL_DEBUG
+                        Serial.print(data[count], HEX);
+                        if (count + 1 < length) Serial.print(" ");
+                    #endif
+                }
+
+                useWire->endTransmission();
+            }
+        #elif (ARDUINO == 100)
+            // Arduino v1.0.0, Wire library
+            // Adds standardized write() and read() stream methods instead of send() and receive()
+
+            // I2C/TWI subsystem uses internal buffer that breaks with large data requests
+            // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
+            // smaller chunks instead of all at once
+            for (int k = 0; k < length; k += min((int)length, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
+                useWire->beginTransmission(devAddr);
+                useWire->write(regAddr);
+                useWire->endTransmission();
+                useWire->beginTransmission(devAddr);
+                useWire->requestFrom((uint8_t)devAddr, (uint8_t)min((int)length - k, I2CDEVLIB_WIRE_BUFFER_LENGTH));
+
+                for (; useWire->available() && (timeout == 0 || millis() - t1 < timeout); count++) {
+                    data[count] = useWire->read();
+                    #ifdef I2CDEV_SERIAL_DEBUG
+                        Serial.print(data[count], HEX);
+                        if (count + 1 < length) Serial.print(" ");
+                    #endif
+                }
+
+                useWire->endTransmission();
+            }
+        #elif (ARDUINO > 100)
+            // Arduino v1.0.1+, Wire library
+            // Adds official support for repeated start condition, yay!
+
+            // I2C/TWI subsystem uses internal buffer that breaks with large data requests
+            // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
+            // smaller chunks instead of all at once
+            for (int k = 0; k < length; k += min((int)length, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
+                useWire->beginTransmission(devAddr);
+                useWire->write(regAddr);
+                useWire->endTransmission();
+                useWire->beginTransmission(devAddr);
+                useWire->requestFrom((uint8_t)devAddr, (uint8_t)min((int)length - k, I2CDEVLIB_WIRE_BUFFER_LENGTH));
+
+                for (; useWire->available() && (timeout == 0 || millis() - t1 < timeout); count++) {
+                    data[count] = useWire->read();
+                    #ifdef I2CDEV_SERIAL_DEBUG
+                        Serial.print(data[count], HEX);
+                        if (count + 1 < length) Serial.print(" ");
+                    #endif
+                }
+            }
+        #endif
+
+    #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+
+        // Fastwire library
+        // no loop required for fastwire
+        uint8_t status = Fastwire::readBuf(devAddr << 1, regAddr, data, length);
+        if (status == 0) {
+            count = length; // success
+        } else {
+            count = -1; // error
         }
-    }
+
+    #endif
 
     // check for timeout
     if (timeout > 0 && millis() - t1 >= timeout && count < length) count = -1; // timeout
+
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print(". Done (");
+        Serial.print(count, DEC);
+        Serial.println(" read).");
+    #endif
 
     return count;
 }
@@ -244,148 +328,148 @@ int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
  * @return Number of words read (-1 indicates failure)
  */
-int8_t I2Cdev::readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t* data, uint16_t timeout, void* wireObj) {
-#ifdef I2CDEV_SERIAL_DEBUG
-    Serial.print("I2C (0x");
-    Serial.print(devAddr, HEX);
-    Serial.print(") reading ");
-    Serial.print(length, DEC);
-    Serial.print(" words from 0x");
-    Serial.print(regAddr, HEX);
-    Serial.print("...");
-#endif
+int8_t I2Cdev::readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t *data, uint16_t timeout, void *wireObj) {
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print("I2C (0x");
+        Serial.print(devAddr, HEX);
+        Serial.print(") reading2 ");
+        Serial.print(length, DEC);
+        Serial.print(" words from 0x");
+        Serial.print(regAddr, HEX);
+        Serial.print("...");
+    #endif
 
     int8_t count = 0;
     uint32_t t1 = millis();
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE
-    TwoWire* useWire = &Wire;
-    if (wireObj) useWire = (TwoWire*)wireObj;
+        TwoWire *useWire = &Wire;
+        if (wireObj) useWire = (TwoWire *)wireObj;
 
-#if (ARDUINO < 100)
-    // Arduino v00xx (before v1.0), Wire library
+        #if (ARDUINO < 100)
+            // Arduino v00xx (before v1.0), Wire library
 
-    // I2C/TWI subsystem uses internal buffer that breaks with large data requests
-    // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
-    // smaller chunks instead of all at once
-    for (uint8_t k = 0; k < length * 2; k += min(length * 2, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
-        useWire->beginTransmission(devAddr);
-        useWire->send(regAddr);
-        useWire->endTransmission();
-        useWire->beginTransmission(devAddr);
-        useWire->requestFrom(devAddr, (uint8_t)(length * 2)); // length=words, this wants bytes
+            // I2C/TWI subsystem uses internal buffer that breaks with large data requests
+            // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
+            // smaller chunks instead of all at once
+            for (uint8_t k = 0; k < length * 2; k += min(length * 2, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
+                useWire->beginTransmission(devAddr);
+                useWire->send(regAddr);
+                useWire->endTransmission();
+                useWire->beginTransmission(devAddr);
+                useWire->requestFrom(devAddr, (uint8_t)(length * 2)); // length=words, this wants bytes
 
-        bool msb = true; // starts with MSB, then LSB
-        for (; useWire->available() && count < length && (timeout == 0 || millis() - t1 < timeout);) {
-            if (msb) {
-                // first byte is bits 15-8 (MSb=15)
-                data[count] = useWire->receive() << 8;
-            } else {
-                // second byte is bits 7-0 (LSb=0)
-                data[count] |= useWire->receive();
-#ifdef I2CDEV_SERIAL_DEBUG
-                Serial.print(data[count], HEX);
-                if (count + 1 < length) Serial.print(" ");
-#endif
-                count++;
+                bool msb = true; // starts with MSB, then LSB
+                for (; useWire->available() && count < length && (timeout == 0 || millis() - t1 < timeout);) {
+                    if (msb) {
+                        // first byte is bits 15-8 (MSb=15)
+                        data[count] = useWire->receive() << 8;
+                    } else {
+                        // second byte is bits 7-0 (LSb=0)
+                        data[count] |= useWire->receive();
+                        #ifdef I2CDEV_SERIAL_DEBUG
+                            Serial.print(data[count], HEX);
+                            if (count + 1 < length) Serial.print(" ");
+                        #endif
+                        count++;
+                    }
+                    msb = !msb;
+                }
+
+                useWire->endTransmission();
             }
-            msb = !msb;
-        }
+        #elif (ARDUINO == 100)
+            // Arduino v1.0.0, Wire library
+            // Adds standardized write() and read() stream methods instead of send() and receive()
 
-        useWire->endTransmission();
-    }
-#elif (ARDUINO == 100)
-    // Arduino v1.0.0, Wire library
-    // Adds standardized write() and read() stream methods instead of send() and receive()
+            // I2C/TWI subsystem uses internal buffer that breaks with large data requests
+            // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
+            // smaller chunks instead of all at once
+            for (uint8_t k = 0; k < length * 2; k += min(length * 2, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
+                useWire->beginTransmission(devAddr);
+                useWire->write(regAddr);
+                useWire->endTransmission();
+                useWire->beginTransmission(devAddr);
+                useWire->requestFrom(devAddr, (uint8_t)(length * 2)); // length=words, this wants bytes
 
-    // I2C/TWI subsystem uses internal buffer that breaks with large data requests
-    // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
-    // smaller chunks instead of all at once
-    for (uint8_t k = 0; k < length * 2; k += min(length * 2, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
-        useWire->beginTransmission(devAddr);
-        useWire->write(regAddr);
-        useWire->endTransmission();
-        useWire->beginTransmission(devAddr);
-        useWire->requestFrom(devAddr, (uint8_t)(length * 2)); // length=words, this wants bytes
+                bool msb = true; // starts with MSB, then LSB
+                for (; useWire->available() && count < length && (timeout == 0 || millis() - t1 < timeout);) {
+                    if (msb) {
+                        // first byte is bits 15-8 (MSb=15)
+                        data[count] = useWire->read() << 8;
+                    } else {
+                        // second byte is bits 7-0 (LSb=0)
+                        data[count] |= useWire->read();
+                        #ifdef I2CDEV_SERIAL_DEBUG
+                            Serial.print(data[count], HEX);
+                            if (count + 1 < length) Serial.print(" ");
+                        #endif
+                        count++;
+                    }
+                    msb = !msb;
+                }
 
-        bool msb = true; // starts with MSB, then LSB
-        for (; useWire->available() && count < length && (timeout == 0 || millis() - t1 < timeout);) {
-            if (msb) {
-                // first byte is bits 15-8 (MSb=15)
-                data[count] = useWire->read() << 8;
-            } else {
-                // second byte is bits 7-0 (LSb=0)
-                data[count] |= useWire->read();
-#ifdef I2CDEV_SERIAL_DEBUG
-                Serial.print(data[count], HEX);
-                if (count + 1 < length) Serial.print(" ");
-#endif
-                count++;
+                useWire->endTransmission();
             }
-            msb = !msb;
-        }
+        #elif (ARDUINO > 100)
+            // Arduino v1.0.1+, Wire library
+            // Adds official support for repeated start condition, yay!
 
-        useWire->endTransmission();
-    }
-#elif (ARDUINO > 100)
-    // Arduino v1.0.1+, Wire library
-    // Adds official support for repeated start condition, yay!
+            // I2C/TWI subsystem uses internal buffer that breaks with large data requests
+            // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
+            // smaller chunks instead of all at once
+            for (uint8_t k = 0; k < length * 2; k += min(length * 2, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
+                useWire->beginTransmission(devAddr);
+                useWire->write(regAddr);
+                useWire->endTransmission();
+                useWire->beginTransmission(devAddr);
+                useWire->requestFrom(devAddr, (uint8_t)(length * 2)); // length=words, this wants bytes
 
-    // I2C/TWI subsystem uses internal buffer that breaks with large data requests
-    // so if user requests more than I2CDEVLIB_WIRE_BUFFER_LENGTH bytes, we have to do it in
-    // smaller chunks instead of all at once
-    for (uint8_t k = 0; k < length * 2; k += min(length * 2, I2CDEVLIB_WIRE_BUFFER_LENGTH)) {
-        useWire->beginTransmission(devAddr);
-        useWire->write(regAddr);
-        useWire->endTransmission();
-        useWire->beginTransmission(devAddr);
-        useWire->requestFrom(devAddr, (uint8_t)(length * 2)); // length=words, this wants bytes
+                bool msb = true; // starts with MSB, then LSB
+                for (; useWire->available() && count < length && (timeout == 0 || millis() - t1 < timeout);) {
+                    if (msb) {
+                        // first byte is bits 15-8 (MSb=15)
+                        data[count] = useWire->read() << 8;
+                    } else {
+                        // second byte is bits 7-0 (LSb=0)
+                        data[count] |= useWire->read();
+                        #ifdef I2CDEV_SERIAL_DEBUG
+                            Serial.print(data[count], HEX);
+                            if (count + 1 < length) Serial.print(" ");
+                        #endif
+                        count++;
+                    }
+                    msb = !msb;
+                }
 
-        bool msb = true; // starts with MSB, then LSB
-        for (; useWire->available() && count < length && (timeout == 0 || millis() - t1 < timeout);) {
-            if (msb) {
-                // first byte is bits 15-8 (MSb=15)
-                data[count] = useWire->read() << 8;
-            } else {
-                // second byte is bits 7-0 (LSb=0)
-                data[count] |= useWire->read();
-#ifdef I2CDEV_SERIAL_DEBUG
-                Serial.print(data[count], HEX);
-                if (count + 1 < length) Serial.print(" ");
-#endif
-                count++;
+                useWire->endTransmission();
             }
-            msb = !msb;
+        #endif
+
+    #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+
+        // Fastwire library
+        // no loop required for fastwire
+        uint8_t intermediate[(uint8_t)length*2];
+        uint8_t status = Fastwire::readBuf(devAddr << 1, regAddr, intermediate, (uint8_t)(length * 2));
+        if (status == 0) {
+            count = length; // success
+            for (uint8_t i = 0; i < length; i++) {
+                data[i] = (intermediate[2*i] << 8) | intermediate[2*i + 1];
+            }
+        } else {
+            count = -1; // error
         }
 
-        useWire->endTransmission();
-    }
-#endif
-
-#elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
-
-    // Fastwire library
-    // no loop required for fastwire
-    uint8_t intermediate[(uint8_t)length * 2];
-    uint8_t status = Fastwire::readBuf(devAddr << 1, regAddr, intermediate, (uint8_t)(length * 2));
-    if (status == 0) {
-        count = length; // success
-        for (uint8_t i = 0; i < length; i++) {
-            data[i] = (intermediate[2 * i] << 8) | intermediate[2 * i + 1];
-        }
-    } else {
-        count = -1; // error
-    }
-
-#endif
+    #endif
 
     if (timeout > 0 && millis() - t1 >= timeout && count < length) count = -1; // timeout
 
-#ifdef I2CDEV_SERIAL_DEBUG
-    Serial.print(". Done (");
-    Serial.print(count, DEC);
-    Serial.println(" read).");
-#endif
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print(". Done (");
+        Serial.print(count, DEC);
+        Serial.println(" read).");
+    #endif
 
     return count;
 }
@@ -397,7 +481,7 @@ int8_t I2Cdev::readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint1
  * @param value New bit value to write
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data, void* wireObj) {
+bool I2Cdev::writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data, void *wireObj) {
     uint8_t b;
     readByte(devAddr, regAddr, &b, I2Cdev::readTimeout, wireObj);
     b = (data != 0) ? (b | (1 << bitNum)) : (b & ~(1 << bitNum));
@@ -411,7 +495,7 @@ bool I2Cdev::writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t 
  * @param value New bit value to write
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t data, void* wireObj) {
+bool I2Cdev::writeBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t data, void *wireObj) {
     uint16_t w;
     readWord(devAddr, regAddr, &w, I2Cdev::readTimeout, wireObj);
     w = (data != 0) ? (w | (1 << bitNum)) : (w & ~(1 << bitNum));
@@ -426,7 +510,7 @@ bool I2Cdev::writeBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_
  * @param data Right-aligned value to write
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data, void* wireObj) {
+bool I2Cdev::writeBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data, void *wireObj) {
     //      010 value to write
     // 76543210 bit numbers
     //    xxx   args: bitStart=4, length=3
@@ -455,7 +539,7 @@ bool I2Cdev::writeBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8
  * @param data Right-aligned value to write
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t data, void* wireObj) {
+bool I2Cdev::writeBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t data, void *wireObj) {
     //              010 value to write
     // fedcba9876543210 bit numbers
     //    xxx           args: bitStart=12, length=3
@@ -482,7 +566,7 @@ bool I2Cdev::writeBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint
  * @param data New byte value to write
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data, void* wireObj) {
+bool I2Cdev::writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data, void *wireObj) {
     return writeBytes(devAddr, regAddr, 1, &data, wireObj);
 }
 
@@ -492,7 +576,7 @@ bool I2Cdev::writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data, void* wir
  * @param data New word value to write
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeWord(uint8_t devAddr, uint8_t regAddr, uint16_t data, void* wireObj) {
+bool I2Cdev::writeWord(uint8_t devAddr, uint8_t regAddr, uint16_t data, void *wireObj) {
     return writeWords(devAddr, regAddr, 1, &data, wireObj);
 }
 
@@ -503,63 +587,63 @@ bool I2Cdev::writeWord(uint8_t devAddr, uint8_t regAddr, uint16_t data, void* wi
  * @param data Buffer to copy new data from
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t* data, void* wireObj) {
-#ifdef I2CDEV_SERIAL_DEBUG
-    Serial.print("I2C (0x");
-    Serial.print(devAddr, HEX);
-    Serial.print(") writing ");
-    Serial.print(length, DEC);
-    Serial.print(" bytes to 0x");
-    Serial.print(regAddr, HEX);
-    Serial.print("...");
-#endif
+bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t* data, void *wireObj) {
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print("I2C (0x");
+        Serial.print(devAddr, HEX);
+        Serial.print(") writing ");
+        Serial.print(length, DEC);
+        Serial.print(" bytes to 0x");
+        Serial.print(regAddr, HEX);
+        Serial.print("...");
+    #endif
     uint8_t status = 0;
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE
-    TwoWire* useWire = &Wire;
-    if (wireObj) useWire = (TwoWire*)wireObj;
+    TwoWire *useWire = &Wire;
+    if (wireObj) useWire = (TwoWire *)wireObj;
 #endif
 
-#if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-    useWire->beginTransmission(devAddr);
-    useWire->send((uint8_t)regAddr); // send address
-#elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
+    #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
+        useWire->beginTransmission(devAddr);
+        useWire->send((uint8_t) regAddr); // send address
+    #elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
             || (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE && ARDUINO >= 100) \
             || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE)
-    useWire->beginTransmission(devAddr);
-    useWire->write((uint8_t)regAddr); // send address
-#elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
-    Fastwire::beginTransmission(devAddr);
-    Fastwire::write(regAddr);
-#endif
+        useWire->beginTransmission(devAddr);
+        useWire->write((uint8_t) regAddr); // send address
+    #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+        Fastwire::beginTransmission(devAddr);
+        Fastwire::write(regAddr);
+    #endif
     for (uint8_t i = 0; i < length; i++) {
-#ifdef I2CDEV_SERIAL_DEBUG
-        Serial.print(data[i], HEX);
-        if (i + 1 < length) Serial.print(" ");
-#endif
-#if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-        useWire->send((uint8_t)data[i]);
-#elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
+        #ifdef I2CDEV_SERIAL_DEBUG
+            Serial.print(data[i], HEX);
+            if (i + 1 < length) Serial.print(" ");
+        #endif
+        #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
+            useWire->send((uint8_t) data[i]);
+        #elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
                 || (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE && ARDUINO >= 100) \
                 || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE)
-        useWire->write((uint8_t)data[i]);
-#elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
-        Fastwire::write((uint8_t)data[i]);
-#endif
+            useWire->write((uint8_t) data[i]);
+        #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+            Fastwire::write((uint8_t) data[i]);
+        #endif
     }
-#if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-    useWire->endTransmission();
-#elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
+    #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
+        useWire->endTransmission();
+    #elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
             || (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE && ARDUINO >= 100) \
             || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE)
-    status = useWire->endTransmission();
-#elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
-    Fastwire::stop();
-    //status = Fastwire::endTransmission();
-#endif
-#ifdef I2CDEV_SERIAL_DEBUG
-    Serial.println(". Done.");
-#endif
+        status = useWire->endTransmission();
+    #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+        Fastwire::stop();
+        //status = Fastwire::endTransmission();
+    #endif
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.println(". Done.");
+    #endif
     return status == 0;
 }
 
@@ -570,67 +654,67 @@ bool I2Cdev::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_
  * @param data Buffer to copy new data from
  * @return Status of operation (true = success)
  */
-bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t* data, void* wireObj) {
-#ifdef I2CDEV_SERIAL_DEBUG
-    Serial.print("I2C (0x");
-    Serial.print(devAddr, HEX);
-    Serial.print(") writing ");
-    Serial.print(length, DEC);
-    Serial.print(" words to 0x");
-    Serial.print(regAddr, HEX);
-    Serial.print("...");
-#endif
+bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t* data, void *wireObj) {
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print("I2C (0x");
+        Serial.print(devAddr, HEX);
+        Serial.print(") writing ");
+        Serial.print(length, DEC);
+        Serial.print(" words to 0x");
+        Serial.print(regAddr, HEX);
+        Serial.print("...");
+    #endif
     uint8_t status = 0;
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE
-    TwoWire* useWire = &Wire;
-    if (wireObj) useWire = (TwoWire*)wireObj;
+    TwoWire *useWire = &Wire;
+    if (wireObj) useWire = (TwoWire *)wireObj;
 #endif
 
-#if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-    useWire->beginTransmission(devAddr);
-    useWire->send(regAddr); // send address
-#elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
+    #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
+        useWire->beginTransmission(devAddr);
+        useWire->send(regAddr); // send address
+    #elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
             || (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE && ARDUINO >= 100) \
             || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE)
-    useWire->beginTransmission(devAddr);
-    useWire->write(regAddr); // send address
-#elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
-    Fastwire::beginTransmission(devAddr);
-    Fastwire::write(regAddr);
-#endif
+        useWire->beginTransmission(devAddr);
+        useWire->write(regAddr); // send address
+    #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+        Fastwire::beginTransmission(devAddr);
+        Fastwire::write(regAddr);
+    #endif
     for (uint8_t i = 0; i < length; i++) {
-#ifdef I2CDEV_SERIAL_DEBUG
-        Serial.print(data[i], HEX);
-        if (i + 1 < length) Serial.print(" ");
-#endif
-#if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-        useWire->send((uint8_t)(data[i] >> 8));     // send MSB
-        useWire->send((uint8_t)data[i]);          // send LSB
-#elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
+        #ifdef I2CDEV_SERIAL_DEBUG
+            Serial.print(data[i], HEX);
+            if (i + 1 < length) Serial.print(" ");
+        #endif
+        #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
+            useWire->send((uint8_t)(data[i] >> 8));     // send MSB
+            useWire->send((uint8_t)data[i]);          // send LSB
+        #elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
                 || (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE && ARDUINO >= 100) \
                 || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE)
-        useWire->write((uint8_t)(data[i] >> 8));    // send MSB
-        useWire->write((uint8_t)data[i]);         // send LSB
-#elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
-        Fastwire::write((uint8_t)(data[i] >> 8));       // send MSB
-        status = Fastwire::write((uint8_t)data[i]);   // send LSB
-        if (status != 0) break;
-#endif
+            useWire->write((uint8_t)(data[i] >> 8));    // send MSB
+            useWire->write((uint8_t)data[i]);         // send LSB
+        #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+            Fastwire::write((uint8_t)(data[i] >> 8));       // send MSB
+            status = Fastwire::write((uint8_t)data[i]);   // send LSB
+            if (status != 0) break;
+        #endif
     }
-#if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-    useWire->endTransmission();
-#elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
+    #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
+        useWire->endTransmission();
+    #elif ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100) \
             || (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_SBWIRE && ARDUINO >= 100) \
             || I2CDEV_IMPLEMENTATION == I2CDEV_TEENSY_3X_WIRE)
-    status = useWire->endTransmission();
-#elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
-    Fastwire::stop();
-    //status = Fastwire::endTransmission();
-#endif
-#ifdef I2CDEV_SERIAL_DEBUG
-    Serial.println(". Done.");
-#endif
+        status = useWire->endTransmission();
+    #elif (I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE)
+        Fastwire::stop();
+        //status = Fastwire::endTransmission();
+    #endif
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.println(". Done.");
+    #endif
     return status == 0;
 }
 
@@ -640,528 +724,528 @@ bool I2Cdev::writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16
 uint16_t I2Cdev::readTimeout = I2CDEV_DEFAULT_READ_TIMEOUT;
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
-// I2C library
-//////////////////////
-// Copyright(C) 2012
-// Francesco Ferrara
-// ferrara[at]libero[point]it
-//////////////////////
+    // I2C library
+    //////////////////////
+    // Copyright(C) 2012
+    // Francesco Ferrara
+    // ferrara[at]libero[point]it
+    //////////////////////
 
-/*
-FastWire
-- 0.24 added stop
-- 0.23 added reset
+    /*
+    FastWire
+    - 0.24 added stop
+    - 0.23 added reset
 
- This is a library to help faster programs to read I2C devices.
- Copyright(C) 2012 Francesco Ferrara
- occhiobello at gmail dot com
- [used by Jeff Rowberg for I2Cdevlib with permission]
- */
+     This is a library to help faster programs to read I2C devices.
+     Copyright(C) 2012 Francesco Ferrara
+     occhiobello at gmail dot com
+     [used by Jeff Rowberg for I2Cdevlib with permission]
+     */
 
-boolean Fastwire::waitInt() {
-    int l = 250;
-    while (!(TWCR & (1 << TWINT)) && l-- > 0);
-    return l > 0;
-}
-
-void Fastwire::setup(int khz, boolean pullup) {
-    TWCR = 0;
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega328P__)
-    // activate internal pull-ups for twi (PORTC bits 4 & 5)
-    // as per note from atmega8 manual pg167
-    if (pullup) PORTC |= ((1 << 4) | (1 << 5));
-    else        PORTC &= ~((1 << 4) | (1 << 5));
-#elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
-    // activate internal pull-ups for twi (PORTC bits 0 & 1)
-    if (pullup) PORTC |= ((1 << 0) | (1 << 1));
-    else        PORTC &= ~((1 << 0) | (1 << 1));
-#else
-    // activate internal pull-ups for twi (PORTD bits 0 & 1)
-    // as per note from atmega128 manual pg204
-    if (pullup) PORTD |= ((1 << 0) | (1 << 1));
-    else        PORTD &= ~((1 << 0) | (1 << 1));
-#endif
-
-    TWSR = 0; // no prescaler => prescaler = 1
-    TWBR = F_CPU / 2000 / khz - 8; // change the I2C clock rate
-    TWCR = 1 << TWEN; // enable twi module, no interrupt
-}
-
-// added by Jeff Rowberg 2013-05-07:
-// Arduino Wire-style "beginTransmission" function
-// (takes 7-bit device address like the Wire method, NOT 8-bit: 0x68, not 0xD0/0xD1)
-byte Fastwire::beginTransmission(byte device) {
-    byte twst, retry;
-    retry = 2;
-    do {
-        TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
-        if (!waitInt()) return 1;
-        twst = TWSR & 0xF8;
-        if (twst != TW_START && twst != TW_REP_START) return 2;
-
-        //Serial.print(device, HEX);
-        //Serial.print(" ");
-        TWDR = device << 1; // send device address without read bit (1)
-        TWCR = (1 << TWINT) | (1 << TWEN);
-        if (!waitInt()) return 3;
-        twst = TWSR & 0xF8;
-    } while (twst == TW_MT_SLA_NACK && retry-- > 0);
-    if (twst != TW_MT_SLA_ACK) return 4;
-    return 0;
-}
-
-byte Fastwire::writeBuf(byte device, byte address, byte* data, byte num) {
-    byte twst, retry;
-
-    retry = 2;
-    do {
-        TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
-        if (!waitInt()) return 1;
-        twst = TWSR & 0xF8;
-        if (twst != TW_START && twst != TW_REP_START) return 2;
-
-        //Serial.print(device, HEX);
-        //Serial.print(" ");
-        TWDR = device & 0xFE; // send device address without read bit (1)
-        TWCR = (1 << TWINT) | (1 << TWEN);
-        if (!waitInt()) return 3;
-        twst = TWSR & 0xF8;
-    } while (twst == TW_MT_SLA_NACK && retry-- > 0);
-    if (twst != TW_MT_SLA_ACK) return 4;
-
-    //Serial.print(address, HEX);
-    //Serial.print(" ");
-    TWDR = address; // send data to the previously addressed device
-    TWCR = (1 << TWINT) | (1 << TWEN);
-    if (!waitInt()) return 5;
-    twst = TWSR & 0xF8;
-    if (twst != TW_MT_DATA_ACK) return 6;
-
-    for (byte i = 0; i < num; i++) {
-        //Serial.print(data[i], HEX);
-        //Serial.print(" ");
-        TWDR = data[i]; // send data to the previously addressed device
-        TWCR = (1 << TWINT) | (1 << TWEN);
-        if (!waitInt()) return 7;
-        twst = TWSR & 0xF8;
-        if (twst != TW_MT_DATA_ACK) return 8;
+    boolean Fastwire::waitInt() {
+        int l = 250;
+        while (!(TWCR & (1 << TWINT)) && l-- > 0);
+        return l > 0;
     }
-    //Serial.print("\n");
 
-    return 0;
-}
+    void Fastwire::setup(int khz, boolean pullup) {
+        TWCR = 0;
+        #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega328P__)
+            // activate internal pull-ups for twi (PORTC bits 4 & 5)
+            // as per note from atmega8 manual pg167
+            if (pullup) PORTC |= ((1 << 4) | (1 << 5));
+            else        PORTC &= ~((1 << 4) | (1 << 5));
+        #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
+            // activate internal pull-ups for twi (PORTC bits 0 & 1)
+            if (pullup) PORTC |= ((1 << 0) | (1 << 1));
+            else        PORTC &= ~((1 << 0) | (1 << 1));
+        #else
+            // activate internal pull-ups for twi (PORTD bits 0 & 1)
+            // as per note from atmega128 manual pg204
+            if (pullup) PORTD |= ((1 << 0) | (1 << 1));
+            else        PORTD &= ~((1 << 0) | (1 << 1));
+        #endif
 
-byte Fastwire::write(byte value) {
-    byte twst;
-    //Serial.println(value, HEX);
-    TWDR = value; // send data
-    TWCR = (1 << TWINT) | (1 << TWEN);
-    if (!waitInt()) return 1;
-    twst = TWSR & 0xF8;
-    if (twst != TW_MT_DATA_ACK) return 2;
-    return 0;
-}
+        TWSR = 0; // no prescaler => prescaler = 1
+        TWBR = F_CPU / 2000 / khz - 8; // change the I2C clock rate
+        TWCR = 1 << TWEN; // enable twi module, no interrupt
+    }
 
-byte Fastwire::readBuf(byte device, byte address, byte* data, byte num) {
-    byte twst, retry;
+    // added by Jeff Rowberg 2013-05-07:
+    // Arduino Wire-style "beginTransmission" function
+    // (takes 7-bit device address like the Wire method, NOT 8-bit: 0x68, not 0xD0/0xD1)
+    byte Fastwire::beginTransmission(byte device) {
+        byte twst, retry;
+        retry = 2;
+        do {
+            TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
+            if (!waitInt()) return 1;
+            twst = TWSR & 0xF8;
+            if (twst != TW_START && twst != TW_REP_START) return 2;
 
-    retry = 2;
-    do {
-        TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
-        if (!waitInt()) return 16;
-        twst = TWSR & 0xF8;
-        if (twst != TW_START && twst != TW_REP_START) return 17;
-
-        //Serial.print(device, HEX);
-        //Serial.print(" ");
-        TWDR = device & 0xfe; // send device address to write
-        TWCR = (1 << TWINT) | (1 << TWEN);
-        if (!waitInt()) return 18;
-        twst = TWSR & 0xF8;
-    } while (twst == TW_MT_SLA_NACK && retry-- > 0);
-    if (twst != TW_MT_SLA_ACK) return 19;
-
-    //Serial.print(address, HEX);
-    //Serial.print(" ");
-    TWDR = address; // send data to the previously addressed device
-    TWCR = (1 << TWINT) | (1 << TWEN);
-    if (!waitInt()) return 20;
-    twst = TWSR & 0xF8;
-    if (twst != TW_MT_DATA_ACK) return 21;
-
-    /***/
-
-    retry = 2;
-    do {
-        TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
-        if (!waitInt()) return 22;
-        twst = TWSR & 0xF8;
-        if (twst != TW_START && twst != TW_REP_START) return 23;
-
-        //Serial.print(device, HEX);
-        //Serial.print(" ");
-        TWDR = device | 0x01; // send device address with the read bit (1)
-        TWCR = (1 << TWINT) | (1 << TWEN);
-        if (!waitInt()) return 24;
-        twst = TWSR & 0xF8;
-    } while (twst == TW_MR_SLA_NACK && retry-- > 0);
-    if (twst != TW_MR_SLA_ACK) return 25;
-
-    for (uint8_t i = 0; i < num; i++) {
-        if (i == num - 1)
+            //Serial.print(device, HEX);
+            //Serial.print(" ");
+            TWDR = device << 1; // send device address without read bit (1)
             TWCR = (1 << TWINT) | (1 << TWEN);
-        else
-            TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA);
-        if (!waitInt()) return 26;
-        twst = TWSR & 0xF8;
-        if (twst != TW_MR_DATA_ACK && twst != TW_MR_DATA_NACK) return twst;
-        data[i] = TWDR;
-        //Serial.print(data[i], HEX);
-        //Serial.print(" ");
+            if (!waitInt()) return 3;
+            twst = TWSR & 0xF8;
+        } while (twst == TW_MT_SLA_NACK && retry-- > 0);
+        if (twst != TW_MT_SLA_ACK) return 4;
+        return 0;
     }
-    //Serial.print("\n");
-    stop();
 
-    return 0;
-}
+    byte Fastwire::writeBuf(byte device, byte address, byte *data, byte num) {
+        byte twst, retry;
 
-void Fastwire::reset() {
-    TWCR = 0;
-}
+        retry = 2;
+        do {
+            TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
+            if (!waitInt()) return 1;
+            twst = TWSR & 0xF8;
+            if (twst != TW_START && twst != TW_REP_START) return 2;
 
-byte Fastwire::stop() {
-    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
-    if (!waitInt()) return 1;
-    return 0;
-}
+            //Serial.print(device, HEX);
+            //Serial.print(" ");
+            TWDR = device & 0xFE; // send device address without read bit (1)
+            TWCR = (1 << TWINT) | (1 << TWEN);
+            if (!waitInt()) return 3;
+            twst = TWSR & 0xF8;
+        } while (twst == TW_MT_SLA_NACK && retry-- > 0);
+        if (twst != TW_MT_SLA_ACK) return 4;
+
+        //Serial.print(address, HEX);
+        //Serial.print(" ");
+        TWDR = address; // send data to the previously addressed device
+        TWCR = (1 << TWINT) | (1 << TWEN);
+        if (!waitInt()) return 5;
+        twst = TWSR & 0xF8;
+        if (twst != TW_MT_DATA_ACK) return 6;
+
+        for (byte i = 0; i < num; i++) {
+            //Serial.print(data[i], HEX);
+            //Serial.print(" ");
+            TWDR = data[i]; // send data to the previously addressed device
+            TWCR = (1 << TWINT) | (1 << TWEN);
+            if (!waitInt()) return 7;
+            twst = TWSR & 0xF8;
+            if (twst != TW_MT_DATA_ACK) return 8;
+        }
+        //Serial.print("\n");
+
+        return 0;
+    }
+
+    byte Fastwire::write(byte value) {
+        byte twst;
+        //Serial.println(value, HEX);
+        TWDR = value; // send data
+        TWCR = (1 << TWINT) | (1 << TWEN);
+        if (!waitInt()) return 1;
+        twst = TWSR & 0xF8;
+        if (twst != TW_MT_DATA_ACK) return 2;
+        return 0;
+    }
+
+    byte Fastwire::readBuf(byte device, byte address, byte *data, byte num) {
+        byte twst, retry;
+
+        retry = 2;
+        do {
+            TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
+            if (!waitInt()) return 16;
+            twst = TWSR & 0xF8;
+            if (twst != TW_START && twst != TW_REP_START) return 17;
+
+            //Serial.print(device, HEX);
+            //Serial.print(" ");
+            TWDR = device & 0xfe; // send device address to write
+            TWCR = (1 << TWINT) | (1 << TWEN);
+            if (!waitInt()) return 18;
+            twst = TWSR & 0xF8;
+        } while (twst == TW_MT_SLA_NACK && retry-- > 0);
+        if (twst != TW_MT_SLA_ACK) return 19;
+
+        //Serial.print(address, HEX);
+        //Serial.print(" ");
+        TWDR = address; // send data to the previously addressed device
+        TWCR = (1 << TWINT) | (1 << TWEN);
+        if (!waitInt()) return 20;
+        twst = TWSR & 0xF8;
+        if (twst != TW_MT_DATA_ACK) return 21;
+
+        /***/
+
+        retry = 2;
+        do {
+            TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO) | (1 << TWSTA);
+            if (!waitInt()) return 22;
+            twst = TWSR & 0xF8;
+            if (twst != TW_START && twst != TW_REP_START) return 23;
+
+            //Serial.print(device, HEX);
+            //Serial.print(" ");
+            TWDR = device | 0x01; // send device address with the read bit (1)
+            TWCR = (1 << TWINT) | (1 << TWEN);
+            if (!waitInt()) return 24;
+            twst = TWSR & 0xF8;
+        } while (twst == TW_MR_SLA_NACK && retry-- > 0);
+        if (twst != TW_MR_SLA_ACK) return 25;
+
+        for (uint8_t i = 0; i < num; i++) {
+            if (i == num - 1)
+                TWCR = (1 << TWINT) | (1 << TWEN);
+            else
+                TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA);
+            if (!waitInt()) return 26;
+            twst = TWSR & 0xF8;
+            if (twst != TW_MR_DATA_ACK && twst != TW_MR_DATA_NACK) return twst;
+            data[i] = TWDR;
+            //Serial.print(data[i], HEX);
+            //Serial.print(" ");
+        }
+        //Serial.print("\n");
+        stop();
+
+        return 0;
+    }
+
+    void Fastwire::reset() {
+        TWCR = 0;
+    }
+
+    byte Fastwire::stop() {
+        TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
+        if (!waitInt()) return 1;
+        return 0;
+    }
 #endif
 
 #if I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE
-// NBWire implementation based heavily on code by Gene Knight <Gene@Telobot.com>
-// Originally posted on the Arduino forum at http://arduino.cc/forum/index.php/topic,70705.0.html
-// Originally offered to the i2cdevlib project at http://arduino.cc/forum/index.php/topic,68210.30.html
+    // NBWire implementation based heavily on code by Gene Knight <Gene@Telobot.com>
+    // Originally posted on the Arduino forum at http://arduino.cc/forum/index.php/topic,70705.0.html
+    // Originally offered to the i2cdevlib project at http://arduino.cc/forum/index.php/topic,68210.30.html
 
-/*
-call this version 1.0
+    /*
+    call this version 1.0
 
-Offhand, the only funky part that I can think of is in nbrequestFrom, where the buffer
-length and index are set *before* the data is actually read. The problem is that these
-are variables local to the TwoWire object, and by the time we actually have read the
-data, and know what the length actually is, we have no simple access to the object's
-variables. The actual bytes read *is* given to the callback function, though.
+    Offhand, the only funky part that I can think of is in nbrequestFrom, where the buffer
+    length and index are set *before* the data is actually read. The problem is that these
+    are variables local to the TwoWire object, and by the time we actually have read the
+    data, and know what the length actually is, we have no simple access to the object's
+    variables. The actual bytes read *is* given to the callback function, though.
 
-The ISR code for a slave receiver is commented out. I don't have that setup, and can't
-verify it at this time. Save it for 2.0!
+    The ISR code for a slave receiver is commented out. I don't have that setup, and can't
+    verify it at this time. Save it for 2.0!
 
-The handling of the read and write processes here is much like in the demo sketch code:
-the process is broken down into sequential functions, where each registers the next as a
-callback, essentially.
+    The handling of the read and write processes here is much like in the demo sketch code:
+    the process is broken down into sequential functions, where each registers the next as a
+    callback, essentially.
 
-For example, for the Read process, twi_read00 just returns if TWI is not yet in a
-ready state. When there's another interrupt, and the interface *is* ready, then it
-sets up the read, starts it, and registers twi_read01 as the function to call after
-the *next* interrupt. twi_read01, then, just returns if the interface is still in a
-"reading" state. When the reading is done, it copies the information to the buffer,
-cleans up, and calls the user-requested callback function with the actual number of
-bytes read.
+    For example, for the Read process, twi_read00 just returns if TWI is not yet in a
+    ready state. When there's another interrupt, and the interface *is* ready, then it
+    sets up the read, starts it, and registers twi_read01 as the function to call after
+    the *next* interrupt. twi_read01, then, just returns if the interface is still in a
+    "reading" state. When the reading is done, it copies the information to the buffer,
+    cleans up, and calls the user-requested callback function with the actual number of
+    bytes read.
 
-The writing is similar.
+    The writing is similar.
 
-Questions, comments and problems can go to Gene@Telobot.com.
+    Questions, comments and problems can go to Gene@Telobot.com.
 
-Thumbs Up!
-Gene Knight
+    Thumbs Up!
+    Gene Knight
 
-*/
-
-uint8_t TwoWire::rxBuffer[NBWIRE_BUFFER_LENGTH];
-uint8_t TwoWire::rxBufferIndex = 0;
-uint8_t TwoWire::rxBufferLength = 0;
-
-uint8_t TwoWire::txAddress = 0;
-uint8_t TwoWire::txBuffer[NBWIRE_BUFFER_LENGTH];
-uint8_t TwoWire::txBufferIndex = 0;
-uint8_t TwoWire::txBufferLength = 0;
-
-//uint8_t TwoWire::transmitting = 0;
-void (*TwoWire::user_onRequest)(void);
-void (*TwoWire::user_onReceive)(int);
-
-static volatile uint8_t twi_transmitting;
-static volatile uint8_t twi_state;
-static uint8_t twi_slarw;
-static volatile uint8_t twi_error;
-static uint8_t twi_masterBuffer[TWI_BUFFER_LENGTH];
-static volatile uint8_t twi_masterBufferIndex;
-static uint8_t twi_masterBufferLength;
-static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
-static volatile uint8_t twi_rxBufferIndex;
-//static volatile uint8_t twi_Interrupt_Continue_Command;
-static volatile uint8_t twi_Return_Value;
-static volatile uint8_t twi_Done;
-void (*twi_cbendTransmissionDone)(int);
-void (*twi_cbreadFromDone)(int);
-
-void twi_init() {
-    // initialize state
-    twi_state = TWI_READY;
-
-    // activate internal pull-ups for twi
-    // as per note from atmega8 manual pg167
-    sbi(PORTC, 4);
-    sbi(PORTC, 5);
-
-    // initialize twi prescaler and bit rate
-    cbi(TWSR, TWPS0); // TWI Status Register - Prescaler bits
-    cbi(TWSR, TWPS1);
-
-    /* twi bit rate formula from atmega128 manual pg 204
-    SCL Frequency = CPU Clock Frequency / (16 + (2 * TWBR))
-    note: TWBR should be 10 or higher for master mode
-    It is 72 for a 16mhz Wiring board with 100kHz TWI */
-
-    TWBR = ((CPU_FREQ / TWI_FREQ) - 16) / 2; // bitrate register
-    // enable twi module, acks, and twi interrupt
-
-    TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA);
-
-    /* TWEN - TWI Enable Bit
-    TWIE - TWI Interrupt Enable
-    TWEA - TWI Enable Acknowledge Bit
-    TWINT - TWI Interrupt Flag
-    TWSTA - TWI Start Condition
     */
-}
 
-typedef struct {
-    uint8_t address;
-    uint8_t* data;
-    uint8_t length;
-    uint8_t wait;
-    uint8_t i;
-} twi_Write_Vars;
+    uint8_t TwoWire::rxBuffer[NBWIRE_BUFFER_LENGTH];
+    uint8_t TwoWire::rxBufferIndex = 0;
+    uint8_t TwoWire::rxBufferLength = 0;
 
-twi_Write_Vars* ptwv = 0;
-static void (*fNextInterruptFunction)(void) = 0;
+    uint8_t TwoWire::txAddress = 0;
+    uint8_t TwoWire::txBuffer[NBWIRE_BUFFER_LENGTH];
+    uint8_t TwoWire::txBufferIndex = 0;
+    uint8_t TwoWire::txBufferLength = 0;
 
-void twi_Finish(byte bRetVal) {
-    if (ptwv) {
-        free(ptwv);
-        ptwv = 0;
+    //uint8_t TwoWire::transmitting = 0;
+    void (*TwoWire::user_onRequest)(void);
+    void (*TwoWire::user_onReceive)(int);
+
+    static volatile uint8_t twi_transmitting;
+    static volatile uint8_t twi_state;
+    static uint8_t twi_slarw;
+    static volatile uint8_t twi_error;
+    static uint8_t twi_masterBuffer[TWI_BUFFER_LENGTH];
+    static volatile uint8_t twi_masterBufferIndex;
+    static uint8_t twi_masterBufferLength;
+    static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
+    static volatile uint8_t twi_rxBufferIndex;
+    //static volatile uint8_t twi_Interrupt_Continue_Command;
+    static volatile uint8_t twi_Return_Value;
+    static volatile uint8_t twi_Done;
+    void (*twi_cbendTransmissionDone)(int);
+    void (*twi_cbreadFromDone)(int);
+
+    void twi_init() {
+        // initialize state
+        twi_state = TWI_READY;
+
+        // activate internal pull-ups for twi
+        // as per note from atmega8 manual pg167
+        sbi(PORTC, 4);
+        sbi(PORTC, 5);
+
+        // initialize twi prescaler and bit rate
+        cbi(TWSR, TWPS0); // TWI Status Register - Prescaler bits
+        cbi(TWSR, TWPS1);
+
+        /* twi bit rate formula from atmega128 manual pg 204
+        SCL Frequency = CPU Clock Frequency / (16 + (2 * TWBR))
+        note: TWBR should be 10 or higher for master mode
+        It is 72 for a 16mhz Wiring board with 100kHz TWI */
+
+        TWBR = ((CPU_FREQ / TWI_FREQ) - 16) / 2; // bitrate register
+        // enable twi module, acks, and twi interrupt
+
+        TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA);
+
+        /* TWEN - TWI Enable Bit
+        TWIE - TWI Interrupt Enable
+        TWEA - TWI Enable Acknowledge Bit
+        TWINT - TWI Interrupt Flag
+        TWSTA - TWI Start Condition
+        */
     }
-    twi_Done = 0xFF;
-    twi_Return_Value = bRetVal;
-    fNextInterruptFunction = 0;
-}
 
-uint8_t twii_WaitForDone(uint16_t timeout) {
-    uint32_t endMillis = millis() + timeout;
-    while (!twi_Done && (timeout == 0 || millis() < endMillis)) continue;
-    return twi_Return_Value;
-}
+    typedef struct {
+        uint8_t address;
+        uint8_t* data;
+        uint8_t length;
+        uint8_t wait;
+        uint8_t i;
+    } twi_Write_Vars;
 
-void twii_SetState(uint8_t ucState) {
-    twi_state = ucState;
-}
+    twi_Write_Vars *ptwv = 0;
+    static void (*fNextInterruptFunction)(void) = 0;
 
-void twii_SetError(uint8_t ucError) {
-    twi_error = ucError;
-}
-
-void twii_InitBuffer(uint8_t ucPos, uint8_t ucLength) {
-    twi_masterBufferIndex = 0;
-    twi_masterBufferLength = ucLength;
-}
-
-void twii_CopyToBuf(uint8_t* pData, uint8_t ucLength) {
-    uint8_t i;
-    for (i = 0; i < ucLength; ++i) {
-        twi_masterBuffer[i] = pData[i];
+    void twi_Finish(byte bRetVal) {
+        if (ptwv) {
+            free(ptwv);
+            ptwv = 0;
+        }
+        twi_Done = 0xFF;
+        twi_Return_Value = bRetVal;
+        fNextInterruptFunction = 0;
     }
-}
 
-void twii_CopyFromBuf(uint8_t* pData, uint8_t ucLength) {
-    uint8_t i;
-    for (i = 0; i < ucLength; ++i) {
-        pData[i] = twi_masterBuffer[i];
+    uint8_t twii_WaitForDone(uint16_t timeout) {
+        uint32_t endMillis = millis() + timeout;
+        while (!twi_Done && (timeout == 0 || millis() < endMillis)) continue;
+        return twi_Return_Value;
     }
-}
 
-void twii_SetSlaRW(uint8_t ucSlaRW) {
-    twi_slarw = ucSlaRW;
-}
+    void twii_SetState(uint8_t ucState) {
+        twi_state = ucState;
+    }
 
-void twii_SetStart() {
-    TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT) | (1 << TWSTA);
-}
+    void twii_SetError(uint8_t ucError) {
+        twi_error = ucError ;
+    }
 
-void twi_write01() {
-    if (TWI_MTX == twi_state) return; // blocking test
-    twi_transmitting = 0;
-    if (twi_error == 0xFF)
-        twi_Finish(0);    // success
-    else if (twi_error == TW_MT_SLA_NACK)
-        twi_Finish(2);    // error: address send, nack received
-    else if (twi_error == TW_MT_DATA_NACK)
-        twi_Finish(3);    // error: data send, nack received
-    else
-        twi_Finish(4);    // other twi error
-    if (twi_cbendTransmissionDone) return twi_cbendTransmissionDone(twi_Return_Value);
-    return;
-}
+    void twii_InitBuffer(uint8_t ucPos, uint8_t ucLength) {
+        twi_masterBufferIndex = 0;
+        twi_masterBufferLength = ucLength;
+    }
 
+    void twii_CopyToBuf(uint8_t* pData, uint8_t ucLength) {
+        uint8_t i;
+        for (i = 0; i < ucLength; ++i) {
+            twi_masterBuffer[i] = pData[i];
+        }
+    }
 
-void twi_write00() {
-    if (TWI_READY != twi_state) return; // blocking test
-    if (TWI_BUFFER_LENGTH < ptwv->length) {
-        twi_Finish(1); // end write with error 1
+    void twii_CopyFromBuf(uint8_t *pData, uint8_t ucLength) {
+        uint8_t i;
+        for (i = 0; i < ucLength; ++i) {
+            pData[i] = twi_masterBuffer[i];
+        }
+    }
+
+    void twii_SetSlaRW(uint8_t ucSlaRW) {
+        twi_slarw = ucSlaRW;
+    }
+
+    void twii_SetStart() {
+        TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT) | (1 << TWSTA);
+    }
+
+    void twi_write01() {
+        if (TWI_MTX == twi_state) return; // blocking test
+        twi_transmitting = 0 ;
+        if (twi_error == 0xFF)
+            twi_Finish (0);    // success
+        else if (twi_error == TW_MT_SLA_NACK)
+            twi_Finish (2);    // error: address send, nack received
+        else if (twi_error == TW_MT_DATA_NACK)
+            twi_Finish (3);    // error: data send, nack received
+        else
+            twi_Finish (4);    // other twi error
+        if (twi_cbendTransmissionDone) return twi_cbendTransmissionDone(twi_Return_Value);
         return;
     }
-    twi_Done = 0x00; // show as working
-    twii_SetState(TWI_MTX); // to transmitting
-    twii_SetError(0xFF); // to No Error
-    twii_InitBuffer(0, ptwv->length); // pointer and length
-    twii_CopyToBuf(ptwv->data, ptwv->length); // get the data
-    twii_SetSlaRW((ptwv->address << 1) | TW_WRITE); // write command
-    twii_SetStart(); // start the cycle
-    fNextInterruptFunction = twi_write01; // next routine
-    return twi_write01();
-}
 
-void twi_writeTo(uint8_t address, uint8_t* data, uint8_t length, uint8_t wait) {
-    uint8_t i;
-    ptwv = (twi_Write_Vars*)malloc(sizeof(twi_Write_Vars));
-    ptwv->address = address;
-    ptwv->data = data;
-    ptwv->length = length;
-    ptwv->wait = wait;
-    fNextInterruptFunction = twi_write00;
-    return twi_write00();
-}
 
-void twi_read01() {
-    if (TWI_MRX == twi_state) return; // blocking test
-    if (twi_masterBufferIndex < ptwv->length) ptwv->length = twi_masterBufferIndex;
-    twii_CopyFromBuf(ptwv->data, ptwv->length);
-    twi_Finish(ptwv->length);
-    if (twi_cbreadFromDone) return twi_cbreadFromDone(twi_Return_Value);
-    return;
-}
-
-void twi_read00() {
-    if (TWI_READY != twi_state) return; // blocking test
-    if (TWI_BUFFER_LENGTH < ptwv->length) twi_Finish(0); // error return
-    twi_Done = 0x00; // show as working
-    twii_SetState(TWI_MRX); // reading
-    twii_SetError(0xFF); // reset error
-    twii_InitBuffer(0, ptwv->length - 1); // init to one less than length
-    twii_SetSlaRW((ptwv->address << 1) | TW_READ); // read command
-    twii_SetStart(); // start cycle
-    fNextInterruptFunction = twi_read01;
-    return twi_read01();
-}
-
-void twi_readFrom(uint8_t address, uint8_t* data, uint8_t length) {
-    uint8_t i;
-
-    ptwv = (twi_Write_Vars*)malloc(sizeof(twi_Write_Vars));
-    ptwv->address = address;
-    ptwv->data = data;
-    ptwv->length = length;
-    fNextInterruptFunction = twi_read00;
-    return twi_read00();
-}
-
-void twi_reply(uint8_t ack) {
-    // transmit master read ready signal, with or without ack
-    if (ack) {
-        TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWEA);
-    } else {
-        TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
-    }
-}
-
-void twi_stop(void) {
-    // send stop condition
-    TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT) | (1 << TWSTO);
-
-    // wait for stop condition to be exectued on bus
-    // TWINT is not set after a stop condition!
-    while (TWCR & (1 << TWSTO)) {
-        continue;
+    void twi_write00() {
+        if (TWI_READY != twi_state) return; // blocking test
+        if (TWI_BUFFER_LENGTH < ptwv -> length) {
+            twi_Finish(1); // end write with error 1
+            return;
+        }
+        twi_Done = 0x00; // show as working
+        twii_SetState(TWI_MTX); // to transmitting
+        twii_SetError(0xFF); // to No Error
+        twii_InitBuffer(0, ptwv -> length); // pointer and length
+        twii_CopyToBuf(ptwv -> data, ptwv -> length); // get the data
+        twii_SetSlaRW((ptwv -> address << 1) | TW_WRITE); // write command
+        twii_SetStart(); // start the cycle
+        fNextInterruptFunction = twi_write01; // next routine
+        return twi_write01();
     }
 
-    // update twi state
-    twi_state = TWI_READY;
-}
+    void twi_writeTo(uint8_t address, uint8_t* data, uint8_t length, uint8_t wait) {
+        uint8_t i;
+        ptwv = (twi_Write_Vars *)malloc(sizeof(twi_Write_Vars));
+        ptwv -> address = address;
+        ptwv -> data = data;
+        ptwv -> length = length;
+        ptwv -> wait = wait;
+        fNextInterruptFunction = twi_write00;
+        return twi_write00();
+    }
 
-void twi_releaseBus(void) {
-    // release bus
-    TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT);
+    void twi_read01() {
+        if (TWI_MRX == twi_state) return; // blocking test
+        if (twi_masterBufferIndex < ptwv -> length) ptwv -> length = twi_masterBufferIndex;
+        twii_CopyFromBuf(ptwv -> data, ptwv -> length);
+        twi_Finish(ptwv -> length);
+        if (twi_cbreadFromDone) return twi_cbreadFromDone(twi_Return_Value);
+        return;
+    }
 
-    // update twi state
-    twi_state = TWI_READY;
-}
+    void twi_read00() {
+        if (TWI_READY != twi_state) return; // blocking test
+        if (TWI_BUFFER_LENGTH < ptwv -> length) twi_Finish(0); // error return
+        twi_Done = 0x00; // show as working
+        twii_SetState(TWI_MRX); // reading
+        twii_SetError(0xFF); // reset error
+        twii_InitBuffer(0, ptwv -> length - 1); // init to one less than length
+        twii_SetSlaRW((ptwv -> address << 1) | TW_READ); // read command
+        twii_SetStart(); // start cycle
+        fNextInterruptFunction = twi_read01;
+        return twi_read01();
+    }
 
-SIGNAL(TWI_vect) {
-    switch (TW_STATUS) {
-        // All Master
-    case TW_START:     // sent start condition
-    case TW_REP_START: // sent repeated start condition
-        // copy device address and r/w bit to output register and ack
-        TWDR = twi_slarw;
-        twi_reply(1);
-        break;
+    void twi_readFrom(uint8_t address, uint8_t* data, uint8_t length) {
+        uint8_t i;
 
-        // Master Transmitter
-    case TW_MT_SLA_ACK:  // slave receiver acked address
-    case TW_MT_DATA_ACK: // slave receiver acked data
-        // if there is data to send, send it, otherwise stop
-        if (twi_masterBufferIndex < twi_masterBufferLength) {
-            // copy data to output register and ack
-            TWDR = twi_masterBuffer[twi_masterBufferIndex++];
-            twi_reply(1);
+        ptwv = (twi_Write_Vars *)malloc(sizeof(twi_Write_Vars));
+        ptwv -> address = address;
+        ptwv -> data = data;
+        ptwv -> length = length;
+        fNextInterruptFunction = twi_read00;
+        return twi_read00();
+    }
+
+    void twi_reply(uint8_t ack) {
+        // transmit master read ready signal, with or without ack
+        if (ack){
+            TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT) | (1 << TWEA);
         } else {
-            twi_stop();
+            TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
         }
-        break;
+    }
 
-    case TW_MT_SLA_NACK:  // address sent, nack received
-        twi_error = TW_MT_SLA_NACK;
-        twi_stop();
-        break;
+    void twi_stop(void) {
+        // send stop condition
+        TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT) | (1 << TWSTO);
 
-    case TW_MT_DATA_NACK: // data sent, nack received
-        twi_error = TW_MT_DATA_NACK;
-        twi_stop();
-        break;
-
-    case TW_MT_ARB_LOST: // lost bus arbitration
-        twi_error = TW_MT_ARB_LOST;
-        twi_releaseBus();
-        break;
-
-        // Master Receiver
-    case TW_MR_DATA_ACK: // data received, ack sent
-        // put byte into buffer
-        twi_masterBuffer[twi_masterBufferIndex++] = TWDR;
-
-    case TW_MR_SLA_ACK:  // address sent, ack received
-        // ack if more bytes are expected, otherwise nack
-        if (twi_masterBufferIndex < twi_masterBufferLength) {
-            twi_reply(1);
-        } else {
-            twi_reply(0);
+        // wait for stop condition to be exectued on bus
+        // TWINT is not set after a stop condition!
+        while (TWCR & (1 << TWSTO)) {
+            continue;
         }
-        break;
 
-    case TW_MR_DATA_NACK: // data received, nack sent
-        // put final byte into buffer
-        twi_masterBuffer[twi_masterBufferIndex++] = TWDR;
+        // update twi state
+        twi_state = TWI_READY;
+    }
 
-    case TW_MR_SLA_NACK: // address sent, nack received
-        twi_stop();
-        break;
+    void twi_releaseBus(void) {
+        // release bus
+        TWCR = (1 << TWEN) | (1 << TWIE) | (1 << TWEA) | (1 << TWINT);
+
+        // update twi state
+        twi_state = TWI_READY;
+    }
+
+    SIGNAL(TWI_vect) {
+        switch (TW_STATUS) {
+            // All Master
+            case TW_START:     // sent start condition
+            case TW_REP_START: // sent repeated start condition
+                // copy device address and r/w bit to output register and ack
+                TWDR = twi_slarw;
+                twi_reply(1);
+                break;
+
+            // Master Transmitter
+            case TW_MT_SLA_ACK:  // slave receiver acked address
+            case TW_MT_DATA_ACK: // slave receiver acked data
+                // if there is data to send, send it, otherwise stop
+                if (twi_masterBufferIndex < twi_masterBufferLength) {
+                    // copy data to output register and ack
+                    TWDR = twi_masterBuffer[twi_masterBufferIndex++];
+                    twi_reply(1);
+                } else {
+                    twi_stop();
+                }
+                break;
+
+            case TW_MT_SLA_NACK:  // address sent, nack received
+                twi_error = TW_MT_SLA_NACK;
+                twi_stop();
+                break;
+
+            case TW_MT_DATA_NACK: // data sent, nack received
+                twi_error = TW_MT_DATA_NACK;
+                twi_stop();
+                break;
+
+            case TW_MT_ARB_LOST: // lost bus arbitration
+                twi_error = TW_MT_ARB_LOST;
+                twi_releaseBus();
+                break;
+
+            // Master Receiver
+            case TW_MR_DATA_ACK: // data received, ack sent
+                // put byte into buffer
+                twi_masterBuffer[twi_masterBufferIndex++] = TWDR;
+
+            case TW_MR_SLA_ACK:  // address sent, ack received
+                // ack if more bytes are expected, otherwise nack
+                if (twi_masterBufferIndex < twi_masterBufferLength) {
+                    twi_reply(1);
+                } else {
+                    twi_reply(0);
+                }
+                break;
+
+            case TW_MR_DATA_NACK: // data received, nack sent
+                // put final byte into buffer
+                twi_masterBuffer[twi_masterBufferIndex++] = TWDR;
+
+            case TW_MR_SLA_NACK: // address sent, nack received
+                twi_stop();
+                break;
 
         // TW_MR_ARB_LOST handled by TW_MT_ARB_LOST case
 
@@ -1263,142 +1347,142 @@ SIGNAL(TWI_vect) {
             */
 
             // all
-    case TW_NO_INFO:   // no state information
-        break;
+            case TW_NO_INFO:   // no state information
+                break;
 
-    case TW_BUS_ERROR: // bus error, illegal stop/start
-        twi_error = TW_BUS_ERROR;
-        twi_stop();
-        break;
-    }
-
-    if (fNextInterruptFunction) return fNextInterruptFunction();
-}
-
-TwoWire::TwoWire() {}
-
-void TwoWire::begin(void) {
-    rxBufferIndex = 0;
-    rxBufferLength = 0;
-
-    txBufferIndex = 0;
-    txBufferLength = 0;
-
-    twi_init();
-}
-
-void TwoWire::beginTransmission(uint8_t address) {
-    //beginTransmission((uint8_t)address);
-
-    // indicate that we are transmitting
-    twi_transmitting = 1;
-
-    // set address of targeted slave
-    txAddress = address;
-
-    // reset tx buffer iterator vars
-    txBufferIndex = 0;
-    txBufferLength = 0;
-}
-
-uint8_t TwoWire::endTransmission(uint16_t timeout) {
-    // transmit buffer (blocking)
-    //int8_t ret =
-    twi_cbendTransmissionDone = NULL;
-    twi_writeTo(txAddress, txBuffer, txBufferLength, 1);
-    int8_t ret = twii_WaitForDone(timeout);
-
-    // reset tx buffer iterator vars
-    txBufferIndex = 0;
-    txBufferLength = 0;
-
-    // indicate that we are done transmitting
-    // twi_transmitting = 0;
-    return ret;
-}
-
-void TwoWire::nbendTransmission(void (*function)(int)) {
-    twi_cbendTransmissionDone = function;
-    twi_writeTo(txAddress, txBuffer, txBufferLength, 1);
-    return;
-}
-
-void TwoWire::send(uint8_t data) {
-    if (twi_transmitting) {
-        // in master transmitter mode
-        // don't bother if buffer is full
-        if (txBufferLength >= NBWIRE_BUFFER_LENGTH) {
-            return;
+            case TW_BUS_ERROR: // bus error, illegal stop/start
+                twi_error = TW_BUS_ERROR;
+                twi_stop();
+                break;
         }
 
-        // put byte in tx buffer
-        txBuffer[txBufferIndex] = data;
-        ++txBufferIndex;
-
-        // update amount in buffer
-        txBufferLength = txBufferIndex;
-    } else {
-        // in slave send mode
-        // reply to master
-        //twi_transmit(&data, 1);
-    }
-}
-
-uint8_t TwoWire::receive(void) {
-    // default to returning null char
-    // for people using with char strings
-    uint8_t value = 0;
-
-    // get each successive byte on each call
-    if (rxBufferIndex < rxBufferLength) {
-        value = rxBuffer[rxBufferIndex];
-        ++rxBufferIndex;
+        if (fNextInterruptFunction) return fNextInterruptFunction();
     }
 
-    return value;
-}
+    TwoWire::TwoWire() { }
 
-uint8_t TwoWire::requestFrom(uint8_t address, int quantity, uint16_t timeout) {
-    // clamp to buffer length
-    if (quantity > NBWIRE_BUFFER_LENGTH) {
-        quantity = NBWIRE_BUFFER_LENGTH;
+    void TwoWire::begin(void) {
+        rxBufferIndex = 0;
+        rxBufferLength = 0;
+
+        txBufferIndex = 0;
+        txBufferLength = 0;
+
+        twi_init();
     }
 
-    // perform blocking read into buffer
-    twi_cbreadFromDone = NULL;
-    twi_readFrom(address, rxBuffer, quantity);
-    uint8_t read = twii_WaitForDone(timeout);
+    void TwoWire::beginTransmission(uint8_t address) {
+        //beginTransmission((uint8_t)address);
 
-    // set rx buffer iterator vars
-    rxBufferIndex = 0;
-    rxBufferLength = read;
+        // indicate that we are transmitting
+        twi_transmitting = 1;
 
-    return read;
-}
+        // set address of targeted slave
+        txAddress = address;
 
-void TwoWire::nbrequestFrom(uint8_t address, int quantity, void (*function)(int)) {
-    // clamp to buffer length
-    if (quantity > NBWIRE_BUFFER_LENGTH) {
-        quantity = NBWIRE_BUFFER_LENGTH;
+        // reset tx buffer iterator vars
+        txBufferIndex = 0;
+        txBufferLength = 0;
     }
 
-    // perform blocking read into buffer
-    twi_cbreadFromDone = function;
-    twi_readFrom(address, rxBuffer, quantity);
-    //uint8_t read = twii_WaitForDone();
+    uint8_t TwoWire::endTransmission(uint16_t timeout) {
+        // transmit buffer (blocking)
+        //int8_t ret =
+        twi_cbendTransmissionDone = NULL;
+        twi_writeTo(txAddress, txBuffer, txBufferLength, 1);
+        int8_t ret = twii_WaitForDone(timeout);
 
-    // set rx buffer iterator vars
-    //rxBufferIndex = 0;
-    //rxBufferLength = read;
+        // reset tx buffer iterator vars
+        txBufferIndex = 0;
+        txBufferLength = 0;
 
-    rxBufferIndex = 0;
-    rxBufferLength = quantity; // this is a hack
+        // indicate that we are done transmitting
+        // twi_transmitting = 0;
+        return ret;
+    }
 
-    return; //read;
-}
+    void TwoWire::nbendTransmission(void (*function)(int)) {
+        twi_cbendTransmissionDone = function;
+        twi_writeTo(txAddress, txBuffer, txBufferLength, 1);
+        return;
+    }
 
-uint8_t TwoWire::available(void) {
-    return rxBufferLength - rxBufferIndex;
-}
+    void TwoWire::send(uint8_t data) {
+        if (twi_transmitting) {
+            // in master transmitter mode
+            // don't bother if buffer is full
+            if (txBufferLength >= NBWIRE_BUFFER_LENGTH) {
+                return;
+            }
+
+            // put byte in tx buffer
+            txBuffer[txBufferIndex] = data;
+            ++txBufferIndex;
+
+            // update amount in buffer
+            txBufferLength = txBufferIndex;
+        } else {
+            // in slave send mode
+            // reply to master
+            //twi_transmit(&data, 1);
+        }
+    }
+
+    uint8_t TwoWire::receive(void) {
+        // default to returning null char
+        // for people using with char strings
+        uint8_t value = 0;
+
+        // get each successive byte on each call
+        if (rxBufferIndex < rxBufferLength) {
+            value = rxBuffer[rxBufferIndex];
+            ++rxBufferIndex;
+        }
+
+        return value;
+    }
+
+    uint8_t TwoWire::requestFrom(uint8_t address, int quantity, uint16_t timeout) {
+        // clamp to buffer length
+        if (quantity > NBWIRE_BUFFER_LENGTH) {
+            quantity = NBWIRE_BUFFER_LENGTH;
+        }
+
+        // perform blocking read into buffer
+        twi_cbreadFromDone = NULL;
+        twi_readFrom(address, rxBuffer, quantity);
+        uint8_t read = twii_WaitForDone(timeout);
+
+        // set rx buffer iterator vars
+        rxBufferIndex = 0;
+        rxBufferLength = read;
+
+        return read;
+    }
+
+    void TwoWire::nbrequestFrom(uint8_t address, int quantity, void (*function)(int)) {
+        // clamp to buffer length
+        if (quantity > NBWIRE_BUFFER_LENGTH) {
+            quantity = NBWIRE_BUFFER_LENGTH;
+        }
+
+        // perform blocking read into buffer
+        twi_cbreadFromDone = function;
+        twi_readFrom(address, rxBuffer, quantity);
+        //uint8_t read = twii_WaitForDone();
+
+        // set rx buffer iterator vars
+        //rxBufferIndex = 0;
+        //rxBufferLength = read;
+
+        rxBufferIndex = 0;
+        rxBufferLength = quantity; // this is a hack
+
+        return; //read;
+    }
+
+    uint8_t TwoWire::available(void) {
+        return rxBufferLength - rxBufferIndex;
+    }
 
 #endif
