@@ -14,6 +14,7 @@ public:
     Mpu6050(uint8_t intPin);
     ~Mpu6050();
     void detectMotionSetup();
+    bool test();
 };
 
 #endif

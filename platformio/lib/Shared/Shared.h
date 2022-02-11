@@ -1,6 +1,6 @@
 // global variables
 
-#define DEBUG // uncomment to activate DEBUG mode
+// #define DEBUG // uncomment to activate DEBUG mode
 
 #define SERIAL_SPEED (uint32_t) 9600 // Serial monitor speed. Set the same value in platformio.ini
 

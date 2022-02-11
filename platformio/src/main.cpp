@@ -73,27 +73,12 @@ void motionDetection(DStates onOrOff) {
       }
       _isSettingUpMotionDetector = true;
       digitalWrite(MOSFET_PIN, HIGH);
-      delay(powerConsumtion.currentCPUSpeed(200));
+      delay(200);
 
-      bool isMotionDetectorPresent = true;
-
-#ifdef DEBUG
-      isMotionDetectorPresent = isMPU6050Present();
-#endif
+      bool isMotionDetectorPresent = mpu6050.test();
 
       if (isMotionDetectorPresent) {
          //// MPU-6050
-         // Wire.begin();
-         // Wire.setClock((long int)powerConsumtion.currentCPUSpeed * 400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-         mpu.TestConnection(2);
-
-         // mpu6050.test();
-
-         // int16_t  Data;
-         // I2Cdev::readWords(MPU6050_ADDRESS, 0x69, 1, (uint16_t*)&Data); // reads 1 or more 16 bit integers (Word)
-         // LOG(String(Data) + CARRIAGE_RETURN);
-         // return;
-
          // Setup the MPU
          mpu.Set_DMP_Output_Rate_Hz(10);           // Set the DMP output rate from 200Hz to 5 Minutes.
          //mpu.Set_DMP_Output_Rate_Seconds(10);    // Set the DMP output rate in Seconds
@@ -111,7 +96,6 @@ void motionDetection(DStates onOrOff) {
          digitalWrite(BUZZER_PIN, LOW);
 
       } else {
-         LOG("ERROR: MPU6050 not found" + CARRIAGE_RETURN);
          digitalWrite(MOSFET_PIN, LOW);
          for (uint8_t i = 0; i < 3; i++) {
             digitalWrite(BUZZER_PIN, HIGH);
@@ -120,20 +104,20 @@ void motionDetection(DStates onOrOff) {
             delay(50);
          }
       }
-      _isSettingUpMotionDetector = false;
       break;
    }
    case DStates::OFF:
    {
-      _isSettingUpMotionDetector = false;
-      digitalWrite(MOSFET_PIN, LOW);
       detachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN));
+      delay(10);
+      digitalWrite(MOSFET_PIN, LOW);
       break;
    }
    default:
       LOG("ERROR: unknown onOrOff (" + String((int)onOrOff) + ")" + CARRIAGE_RETURN);
       break;
    }
+   _isSettingUpMotionDetector = false;
 }
 
 void openCloseStep(DStates openOrClose) {
