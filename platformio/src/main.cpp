@@ -67,41 +67,69 @@ PowerConsumption powerConsumtion = PowerConsumption();
 void motionDetection(DStates onOrOff) {
    switch (onOrOff) {
    case DStates::ON:
+   {
       if (_isSettingUpMotionDetector) {
          return;
       }
       _isSettingUpMotionDetector = true;
       digitalWrite(MOSFET_PIN, HIGH);
-      delay(100);
+      delay(powerConsumtion.currentCPUSpeed(200));
 
+      bool isMotionDetectorPresent = true;
 
-      //// MPU-6050
-      // join I2C bus (I2Cdev library doesn't do this automatically)
-      Wire.begin();
-      Wire.setClock((long int)powerConsumtion.currentCPUSpeed * 400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
-      // Setup the MPU
-      mpu.Set_DMP_Output_Rate_Hz(10);           // Set the DMP output rate from 200Hz to 5 Minutes.
-      //mpu.Set_DMP_Output_Rate_Seconds(10);   // Set the DMP output rate in Seconds
-      //mpu.Set_DMP_Output_Rate_Minutes(5);    // Set the DMP output rate in Minute
-      mpu.SetAddress(MPU6050_ADDRESS); //Sets the address of the MPU.
-      mpu.CalibrateMPU();                      // Calibrates the MPU.
-      mpu.load_DMP_Image();                    // Loads the DMP image into the MPU and finish configuration.
-      mpu6050.detectMotionSetup();
+#ifdef DEBUG
+      isMotionDetectorPresent = isMPU6050Present();
+#endif
 
-      attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, FALLING);
+      if (isMotionDetectorPresent) {
+         //// MPU-6050
+         // Wire.begin();
+         // Wire.setClock((long int)powerConsumtion.currentCPUSpeed * 400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+         mpu.TestConnection(2);
 
-      // tell the user that the motion detection is on
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(100);
-      digitalWrite(BUZZER_PIN, LOW);
+         // mpu6050.test();
 
+         // int16_t  Data;
+         // I2Cdev::readWords(MPU6050_ADDRESS, 0x69, 1, (uint16_t*)&Data); // reads 1 or more 16 bit integers (Word)
+         // LOG(String(Data) + CARRIAGE_RETURN);
+         // return;
+
+         // Setup the MPU
+         mpu.Set_DMP_Output_Rate_Hz(10);           // Set the DMP output rate from 200Hz to 5 Minutes.
+         //mpu.Set_DMP_Output_Rate_Seconds(10);    // Set the DMP output rate in Seconds
+         //mpu.Set_DMP_Output_Rate_Minutes(5);     // Set the DMP output rate in Minute
+         mpu.SetAddress(MPU6050_ADDRESS);          //Sets the address of the MPU.
+         mpu.CalibrateMPU();                       // Calibrates the MPU.
+         mpu.load_DMP_Image();                     // Loads the DMP image into the MPU and finish configuration.
+         mpu6050.detectMotionSetup();
+
+         attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, FALLING);
+
+         // tell the user that the motion detection is on
+         digitalWrite(BUZZER_PIN, HIGH);
+         delay(100);
+         digitalWrite(BUZZER_PIN, LOW);
+
+      } else {
+         LOG("ERROR: MPU6050 not found" + CARRIAGE_RETURN);
+         digitalWrite(MOSFET_PIN, LOW);
+         for (uint8_t i = 0; i < 3; i++) {
+            digitalWrite(BUZZER_PIN, HIGH);
+            delay(50);
+            digitalWrite(BUZZER_PIN, LOW);
+            delay(50);
+         }
+      }
       _isSettingUpMotionDetector = false;
       break;
+   }
    case DStates::OFF:
+   {
       _isSettingUpMotionDetector = false;
       digitalWrite(MOSFET_PIN, LOW);
       detachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN));
       break;
+   }
    default:
       LOG("ERROR: unknown onOrOff (" + String((int)onOrOff) + ")" + CARRIAGE_RETURN);
       break;
@@ -113,9 +141,9 @@ void openCloseStep(DStates openOrClose) {
    case DStates::OPEN:
       if (!isStepOpened) {
          LOG("openCloseStep OPEN" + CARRIAGE_RETURN);
-         digitalWrite(RELAY_CLOSE_PIN, HIGH);
+         digitalWrite(RELAY_CLOSE_PIN, LOW);
          delay(10);
-         digitalWrite(RELAY_OPEN_PIN, LOW);
+         digitalWrite(RELAY_OPEN_PIN, HIGH);
          isStepOpened = true;
          isAutocloseActivated = true;
       } else {
@@ -133,9 +161,9 @@ void openCloseStep(DStates openOrClose) {
       if (isStepOpened) {
          LOG("openCloseStep CLOSE" + CARRIAGE_RETURN);
          motionDetection(DStates::OFF);
-         digitalWrite(RELAY_OPEN_PIN, HIGH);
+         digitalWrite(RELAY_OPEN_PIN, LOW);
          delay(10);
-         digitalWrite(RELAY_CLOSE_PIN, LOW);
+         digitalWrite(RELAY_CLOSE_PIN, HIGH);
          isStepOpened = false;
          isAutocloseActivated = false;
       }
@@ -167,8 +195,8 @@ void doDelayedActions() {
          LOG("isInAction expired" + CARRIAGE_RETURN);
          isInAction = false;
          // release both relays
-         digitalWrite(RELAY_OPEN_PIN, HIGH);
-         digitalWrite(RELAY_CLOSE_PIN, HIGH);
+         digitalWrite(RELAY_OPEN_PIN, LOW);
+         digitalWrite(RELAY_CLOSE_PIN, LOW);
       }
    } else if (isAutocloseActivated) {
       if ((millis() - powerConsumtion.toCPUTime(startTimeAutoClose)) > powerConsumtion.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
@@ -233,8 +261,8 @@ void setup() {
    pinMode(RELAY_CLOSE_PIN, OUTPUT);
 
    digitalWrite(MOSFET_PIN, LOW);
-   digitalWrite(RELAY_OPEN_PIN, HIGH);
-   digitalWrite(RELAY_CLOSE_PIN, HIGH);
+   digitalWrite(RELAY_OPEN_PIN, LOW);
+   digitalWrite(RELAY_CLOSE_PIN, LOW);
 
    // LOW to trigger the interrupt whenever the pin is low,
    // CHANGE to trigger the interrupt whenever the pin changes value
