@@ -52,6 +52,7 @@ void motionDetected() {
       return;
    }
    _isMotionDetected = true;
+   LOG("motion detected" + CARRIAGE_RETURN);
 }
 
 bool isMotionDetected() {
@@ -111,6 +112,7 @@ void motionDetection(DStates onOrOff) {
       detachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN));
       delay(10);
       digitalWrite(MOSFET_PIN, LOW);
+      resetIsMotionDetected();
       break;
    }
    default:
@@ -125,14 +127,17 @@ void openCloseStep(DStates openOrClose) {
    case DStates::OPEN:
       if (!isStepOpened) {
          LOG("openCloseStep OPEN" + CARRIAGE_RETURN);
+         isInAction = true;
          digitalWrite(RELAY_CLOSE_PIN, LOW);
          delay(10);
          digitalWrite(RELAY_OPEN_PIN, HIGH);
          isStepOpened = true;
+         startTime = millis();
+         startTimeAutoClose = millis();
          isAutocloseActivated = true;
       } else {
          startTimeAutoClose = millis(); // restart the timer if the open-step switch is pressed again
-         if (millis() - startTime > powerConsumtion.toCPUTime(STEP_TIME) && millis() - startTime < powerConsumtion.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW)) { // ... if the user has push the button after the step has opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
+         if ((millis() - startTime) > powerConsumtion.toCPUTime(STEP_TIME) && (millis() - startTime < powerConsumtion.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW))) { // ... if the user has pushed the button after the step has just opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
             if (isAutocloseActivated) {
                isAutocloseActivated = false;
                motionDetection(DStates::ON); // motion activation is activated when the step is permanently extended
@@ -144,6 +149,8 @@ void openCloseStep(DStates openOrClose) {
    case DStates::CLOSE:
       if (isStepOpened) {
          LOG("openCloseStep CLOSE" + CARRIAGE_RETURN);
+         isInAction = true;
+         startTime = millis();
          motionDetection(DStates::OFF);
          digitalWrite(RELAY_OPEN_PIN, LOW);
          delay(10);
@@ -156,9 +163,6 @@ void openCloseStep(DStates openOrClose) {
       LOG("ERROR: unknown openOrClose (" + String((int)openOrClose) + ")" + CARRIAGE_RETURN);
       break;
    }
-   isInAction = true;
-   startTime = millis();
-   startTimeAutoClose = startTime;
 }
 
 volatile DStates _switchInput = DStates::NA;
@@ -183,7 +187,7 @@ void doDelayedActions() {
          digitalWrite(RELAY_CLOSE_PIN, LOW);
       }
    } else if (isAutocloseActivated) {
-      if ((millis() - powerConsumtion.toCPUTime(startTimeAutoClose)) > powerConsumtion.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
+      if ((millis() - startTimeAutoClose) > powerConsumtion.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
          LOG("isInAction auto-CLOSE" + CARRIAGE_RETURN);
          openCloseStep(DStates::CLOSE);
          isAutocloseActivated = false;
@@ -192,39 +196,39 @@ void doDelayedActions() {
 }
 
 void loop() {
-   switch (_switchInput) {
-   case DStates::NA:
-      // do nothing
-      break;
-   case DStates::CLOSE:
-      openCloseStep(DStates::CLOSE);
-      break;
-   case DStates::OPEN:
-      openCloseStep(DStates::OPEN);
-      break;
-   default:
-      LOG("ERROR: unknown _switchInput (" + String((int)_switchInput) + ")" + CARRIAGE_RETURN);
-      break;
+   if (_switchInput == DStates::NA) {
+      doDelayedActions();
+   } else {
+      switch (_switchInput) {
+      case DStates::NA:
+         // do nothing
+         break;
+      case DStates::CLOSE:
+         openCloseStep(DStates::CLOSE);
+         break;
+      case DStates::OPEN:
+         openCloseStep(DStates::OPEN);
+         break;
+      default:
+         LOG("ERROR: unknown _switchInput (" + String((int)_switchInput) + ")" + CARRIAGE_RETURN);
+         break;
+      }
    }
    _switchInput = DStates::NA;
 
-   doDelayedActions();
-
-   delay(100);
+   delay(powerConsumtion.toCPUTime(100));
    LOG("_");
 
    if (!isInAction) {
-      if (!isAutocloseActivated) {
-         digitalWrite(BUZZER_PIN, LOW);
-         powerDown();
-      }
       digitalWrite(BUZZER_PIN, LOW);
+      if (!isAutocloseActivated) {
+         powerDown(); // only will wake up by an interruption
+         // the execution continues here after the interruption has been processed
+      }
       if (isMotionDetected()) {
          resetIsMotionDetected();
-         LOG(CARRIAGE_RETURN + "motion detected" + CARRIAGE_RETURN);
          digitalWrite(BUZZER_PIN, HIGH);
          if (isStepOpened) {
-            digitalWrite(BUZZER_PIN, HIGH);
             openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the vehicle is moving
          }
       }
