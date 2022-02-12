@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 #include <Simple_MPU6050.h>
-#include <LowPower.h>
 #include <Shared.h>
 #include <Mpu6050.h>
 #include <PowerConsumption.h>
@@ -225,8 +224,8 @@ void loop() {
    if (!isInAction) {
       digitalWrite(BUZZER_PIN, LOW);
       if (!isAutocloseActivated) {
-         powerDown(); // only will wake up by an interruption
-         // the execution continues here after the interruption has been processed
+         powerConsumtion.sleep(); // only will wake up by an interruption
+          // the execution continues here after the interruption has been processed
       }
       if (isMotionDetected()) {
          resetIsMotionDetected();

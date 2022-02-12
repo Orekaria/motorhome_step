@@ -1,5 +1,4 @@
 #include <PowerConsumption.h>
-#include <Shared.h>
 
 PowerConsumption::PowerConsumption() {
 };
@@ -48,4 +47,9 @@ void PowerConsumption::low() {
 
 uint32_t PowerConsumption::toCPUTime(uint32_t timeToAdjust) {
     return (uint32_t)(timeToAdjust / (uint8_t)(pow(2, (uint8_t)currentCPUSpeed)));
+}
+
+void PowerConsumption::sleep() {
+    Serial.print("power DOWN" + CARRIAGE_RETURN);
+    LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
 }

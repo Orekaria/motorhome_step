@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <LowPower.h>
+#include <Shared.h>
 
 #ifndef POWERCONSUMPTION_H
 #define POWERCONSUMPTION_H
@@ -19,6 +21,7 @@ public:
     void high();
     void low();
     uint32_t toCPUTime(uint32_t timeToAdjust);
+    void sleep();
 private:
 };
 
