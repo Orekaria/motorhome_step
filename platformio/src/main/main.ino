@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include <avr/sleep.h>
-#include <Shared.h>
-#include <Utils.h>
 
+// #define DEBUG
+#define SERIAL_SPEED 57600
+
+const char CARRIAGE_RETURN = "\n";
 const char OPEN = 1;
 const char CLOSE = 0;
 const int LEDPin = LED_BUILTIN;
@@ -22,7 +24,7 @@ unsigned long startTime;
 unsigned long startTimeAutoClose;
 bool isStepLocked = false;
 
-#if DEBUG == true
+#ifdef DEBUG
 void updateLedStatus() {
    if (isStepOpened) {
       digitalWrite(LEDPin, HIGH);
@@ -34,8 +36,8 @@ void updateLedStatus() {
 
 void stepStatus(char desiredStatus) {
    if (desiredStatus == CLOSE) {
-#if DEBUG == true
-      Utils::log("stepStatus CLOSE" + CARRIAGE_RETURN);
+#ifdef DEBUG
+      Serial.print("stepStatus CLOSE" + CARRIAGE_RETURN);
 #endif
       digitalWrite(DOOR_OPEN_PIN, HIGH);
       delay(10);
@@ -43,8 +45,8 @@ void stepStatus(char desiredStatus) {
       isStepOpened = false;
       isAutocloseActivated = false;
    } else if (desiredStatus == OPEN) {
-#if DEBUG == true
-      Utils::log("stepStatus OPEN" + CARRIAGE_RETURN);
+#ifdef DEBUG
+      Serial.print("stepStatus OPEN" + CARRIAGE_RETURN);
 #endif
       digitalWrite(DOOR_CLOSE_PIN, HIGH);
       delay(10);
@@ -94,16 +96,16 @@ void loop() {
       }
    }
 
-#if DEBUG == true
+#ifdef DEBUG
    updateLedStatus();
 #endif
 }
 
 void setup() {
-#if DEBUG == true
+#ifdef DEBUG
    Serial.begin(SERIAL_SPEED);
-   while (!Serial); // wait for Leonardo enumeration, others continue immediately
    Serial.println("Serial initialized");
+   Serial.println("set_sleep_mode(SLEEP_MODE_PWR_SAVE)");
 #endif
 
    // There are five different sleep modes of power saving:
