@@ -19,7 +19,10 @@ void Mpu6050::detectMotionSetup() {
 #define INT_ENABLE          0x38
 #define INT_STATUS          0x3A
 #define MOT_DETECT_CTRL     0x69 // 2-bit unsigned value. Specifies the additional power-on delay in ms applied to accelerometer data path modules.
+#define PWR_MGMT            0x6B // sleepy time
+#define PWR_GYROS           0x6C // gyros
 
+    // I2Cdev::writeByte(MPU6050_ADDRESS, SIGNAL_PATH_RESET, 0x00); // ?
     I2Cdev::writeByte(MPU6050_ADDRESS, SIGNAL_PATH_RESET, 0x07); // Reset all internal signal paths in the MPU-6050;
     I2Cdev::writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, 0x01); // Write register 28 (==0x1C) to set the Digital High Pass Filter, bits 3:0. For example set it to 0x01 for 5Hz. (These 3 bits are grey in the data sheet, but they are used! Leaving them 0 means the filter always outputs 0.)
     I2Cdev::writeByte(MPU6050_ADDRESS, MOT_THR, MOT_THR_SELECTED); // 8-bit unsigned value. Motion is detected when the absolute value of any of the accelerometer measurements exceeds this Motion detection threshold.
@@ -27,6 +30,9 @@ void Mpu6050::detectMotionSetup() {
     I2Cdev::writeByte(MPU6050_ADDRESS, MOT_DETECT_CTRL, 0x15); // write the motion detection decrement and a few other settings (for example write 0x15 to set both free-fall and motion decrements to 1 and accelerometer start-up delay to 5ms total by adding 1ms. )
     I2Cdev::writeByte(MPU6050_ADDRESS, INT_PIN_CFG, 0x80); // now INT pin is active low (old = A0)
     I2Cdev::writeByte(MPU6050_ADDRESS, INT_ENABLE, 0x40); // bit 6 (0x40), to enable motion detection interrupt.
+    // deactivate Temp sensor and Gyros to lower power consumption
+    I2Cdev::writeByte(MPU6050_ADDRESS, PWR_MGMT, 8); // 101000 - Cycle & disable TEMP SENSOR
+    I2Cdev::writeByte(MPU6050_ADDRESS, PWR_GYROS, 7); // Disable Gyros
 }
 
 bool Mpu6050::test() {
