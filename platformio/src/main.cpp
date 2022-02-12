@@ -39,11 +39,6 @@ unsigned long startTimeAutoClose;
 Simple_MPU6050 mpu;
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN);
 
-void powerDown() {
-   LOG("power DOWN" + CARRIAGE_RETURN);
-   LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
-}
-
 volatile bool _isSettingUpMotionDetector = false;
 volatile bool _isMotionDetected = false;
 void motionDetected() {
@@ -79,6 +74,11 @@ void motionDetection(DStates onOrOff) {
 
       if (isMotionDetectorPresent) {
          powerConsumtion.high();
+
+         // be sure that the relays are not closed because activating the motion detection is not async and would keep the step in motion
+         // if any relay is closed at this point, the flow of the program is wrong
+         digitalWrite(RELAY_OPEN_PIN, LOW);
+         digitalWrite(RELAY_CLOSE_PIN, LOW);
 
          //// MPU-6050
          // Setup the MPU
@@ -139,11 +139,15 @@ void openCloseStep(DStates openOrClose) {
          isAutocloseActivated = true;
       } else {
          startTimeAutoClose = millis(); // restart the timer if the open-step switch is pressed again
-         if ((millis() - startTime) > powerConsumtion.toCPUTime(STEP_TIME) && (millis() - startTime < powerConsumtion.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW))) { // ... if the user has pushed the button after the step has just opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
+         if ((millis() - startTime) > powerConsumtion.toCPUTime(STEP_TIME + 100) && (millis() - startTime < powerConsumtion.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW))) { // ... if the user has pushed the button after the step has just opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
             if (isAutocloseActivated) {
-               isAutocloseActivated = false;
-               motionDetection(DStates::ON); // motion activation is activated when the step is permanently extended
-               LOG("isAutocloseActivated false" + CARRIAGE_RETURN);
+               if (isInAction) {
+                  LOG("ERROR: the flow is wrong if the step is already in action");
+               } else {
+                  isAutocloseActivated = false;
+                  motionDetection(DStates::ON); // motion activation is activated when the step is permanently extended
+                  LOG("isAutocloseActivated false" + CARRIAGE_RETURN);
+               }
             }
          }
       }
