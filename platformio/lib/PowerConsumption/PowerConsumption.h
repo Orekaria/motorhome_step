@@ -9,6 +9,7 @@ public:
     enum class CPUSpeed {
         Mhz16 = 0x00,
         Mhz8 = 0x01,
+        Mhz4 = 0x02,
         unknown = 0x99,
     };
     CPUSpeed currentCPUSpeed = CPUSpeed::unknown;

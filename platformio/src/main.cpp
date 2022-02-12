@@ -74,11 +74,13 @@ void motionDetection(DStates onOrOff) {
       }
       _isSettingUpMotionDetector = true;
       digitalWrite(MOSFET_PIN, HIGH);
-      delay(200);
+      delay(powerConsumtion.toCPUTime(200));
 
       bool isMotionDetectorPresent = mpu6050.test();
 
       if (isMotionDetectorPresent) {
+         powerConsumtion.high();
+
          //// MPU-6050
          // Setup the MPU
          mpu.Set_DMP_Output_Rate_Hz(10);           // Set the DMP output rate from 200Hz to 5 Minutes.
@@ -96,13 +98,14 @@ void motionDetection(DStates onOrOff) {
          delay(100);
          digitalWrite(BUZZER_PIN, LOW);
 
+         powerConsumtion.low();
       } else {
          digitalWrite(MOSFET_PIN, LOW);
          for (uint8_t i = 0; i < 3; i++) {
             digitalWrite(BUZZER_PIN, HIGH);
-            delay(50);
+            delay(powerConsumtion.toCPUTime(50));
             digitalWrite(BUZZER_PIN, LOW);
-            delay(50);
+            delay(powerConsumtion.toCPUTime(50));
          }
       }
       break;
@@ -110,7 +113,7 @@ void motionDetection(DStates onOrOff) {
    case DStates::OFF:
    {
       detachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN));
-      delay(10);
+      delay(powerConsumtion.toCPUTime(10));
       digitalWrite(MOSFET_PIN, LOW);
       resetIsMotionDetected();
       break;
@@ -129,7 +132,7 @@ void openCloseStep(DStates openOrClose) {
          LOG("openCloseStep OPEN" + CARRIAGE_RETURN);
          isInAction = true;
          digitalWrite(RELAY_CLOSE_PIN, LOW);
-         delay(10);
+         delay(powerConsumtion.toCPUTime(10));
          digitalWrite(RELAY_OPEN_PIN, HIGH);
          isStepOpened = true;
          startTime = millis();
@@ -153,7 +156,7 @@ void openCloseStep(DStates openOrClose) {
          startTime = millis();
          motionDetection(DStates::OFF);
          digitalWrite(RELAY_OPEN_PIN, LOW);
-         delay(10);
+         delay(powerConsumtion.toCPUTime(10));
          digitalWrite(RELAY_CLOSE_PIN, HIGH);
          isStepOpened = false;
          isAutocloseActivated = false;

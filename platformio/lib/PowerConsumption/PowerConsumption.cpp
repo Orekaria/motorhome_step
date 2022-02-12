@@ -19,11 +19,14 @@ void PowerConsumption::setCPUSpeed(CPUSpeed newCPUSpeed) {
     Serial.begin(SERIAL_SPEED * pow(2, (uint8_t)currentCPUSpeed));
     Serial.print("Power mode: ");
     switch (newCPUSpeed) {
+    case CPUSpeed::Mhz4:
+        Serial.print("4Mhz");
+        break;
     case CPUSpeed::Mhz8:
-        Serial.print("LOW");
+        Serial.print("8Mhz");
         break;
     case CPUSpeed::Mhz16:
-        Serial.print("HIGH");
+        Serial.print("16Mhz");
         break;
     default:
         Serial.print("ERROR");
@@ -36,11 +39,11 @@ void PowerConsumption::setCPUSpeed(CPUSpeed newCPUSpeed) {
 }
 
 void PowerConsumption::high() {
-    this->setCPUSpeed(CPUSpeed::Mhz16);
+    this->setCPUSpeed(CPUSpeed::Mhz8); // 3.3V => max 8
 }
 
 void PowerConsumption::low() {
-    this->setCPUSpeed(CPUSpeed::Mhz8);
+    this->setCPUSpeed(CPUSpeed::Mhz8); // most of the time the Arduino is sleeping, where the clock is stopped. Reducing speed, to save very little power, at the cost of responsiveness, does not look like a good idea
 }
 
 uint32_t PowerConsumption::toCPUTime(uint32_t timeToAdjust) {
