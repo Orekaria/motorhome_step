@@ -7,11 +7,11 @@
 #include <PowerConsumption.h>
 
 enum class DStates {
-   NA,
-   ON,
-   OFF,
+   ON = 0x00,
+   OFF = 0x01,
    OPEN,
-   CLOSE
+   CLOSE,
+   NA,
 };
 
 #define MOSFET_PIN 7
@@ -94,7 +94,7 @@ void motionDetection(DStates onOrOff) {
 
          // tell the user that the motion detection is on
          digitalWrite(BUZZER_PIN, HIGH);
-         delay(100);
+         delay(powerConsumtion.toCPUTime(100));
          digitalWrite(BUZZER_PIN, LOW);
 
          powerConsumtion.low();
@@ -257,6 +257,10 @@ void setup() {
    digitalWrite(MOSFET_PIN, LOW);
    digitalWrite(RELAY_OPEN_PIN, LOW);
    digitalWrite(RELAY_CLOSE_PIN, LOW);
+
+   digitalWrite(BUZZER_PIN, HIGH);
+   delay(powerConsumtion.toCPUTime(50));
+   digitalWrite(BUZZER_PIN, LOW);
 
    // LOW to trigger the interrupt whenever the pin is low,
    // CHANGE to trigger the interrupt whenever the pin changes value
