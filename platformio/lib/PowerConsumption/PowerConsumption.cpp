@@ -38,7 +38,7 @@ void PowerConsumption::setCPUSpeed(CPUSpeed newCPUSpeed) {
 }
 
 void PowerConsumption::high() {
-    this->setCPUSpeed(CPUSpeed::Mhz8); // 3.3V => max 8
+    this->setCPUSpeed(CPUSpeed::Mhz8); // 3.3V => max 8. // at 3.3V, it is recommended to lower the speed of the CPU. timers must be adjusted using the toCPUTime function
 }
 
 void PowerConsumption::low() {

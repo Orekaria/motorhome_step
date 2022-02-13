@@ -73,8 +73,6 @@ void motionDetection(DStates onOrOff) {
       bool isMotionDetectorPresent = mpu6050.test();
 
       if (isMotionDetectorPresent) {
-         powerConsumtion.high();
-
          // be sure that the relays are not closed because activating the motion detection is not async and would keep the step in motion
          // if any relay is closed at this point, the flow of the program is wrong
          digitalWrite(RELAY_OPEN_PIN, LOW);
@@ -96,8 +94,6 @@ void motionDetection(DStates onOrOff) {
          digitalWrite(BUZZER_PIN, HIGH);
          delay(powerConsumtion.toCPUTime(100));
          digitalWrite(BUZZER_PIN, LOW);
-
-         powerConsumtion.low();
       } else {
          digitalWrite(MOSFET_PIN, LOW);
          for (uint8_t i = 0; i < 3; i++) {
@@ -202,8 +198,6 @@ void doDelayedActions() {
 }
 
 void loop() {
-   powerConsumtion.low();
-
    if (_switchInput == DStates::NA) {
       doDelayedActions();
    } else {
@@ -230,8 +224,10 @@ void loop() {
    if (!isInAction) {
       digitalWrite(BUZZER_PIN, LOW);
       if (!isAutocloseActivated) {
+         powerConsumtion.low();
          powerConsumtion.sleep(); // only will wake up by an interruption
           // the execution continues here after the interruption has been processed
+         powerConsumtion.high();
       }
       if (isMotionDetected()) {
          resetIsMotionDetected();
@@ -244,7 +240,7 @@ void loop() {
 }
 
 void setup() {
-   powerConsumtion.low(); // at 3.3V, it is recommended to lower the speed of the CPU. timers must be adjusted.
+   powerConsumtion.high();
 
    pinMode(SWITCH_OPEN_PIN, INPUT_PULLUP);
    pinMode(SWITCH_CLOSE_PIN, INPUT_PULLUP);
