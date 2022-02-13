@@ -126,7 +126,7 @@ public:
     Simple_MPU6050& Set_DMP_Output_Rate_Seconds(float rate = 1); // 1Hz Default
     Simple_MPU6050& Set_DMP_Output_Rate_Minutes(float rate = 1); // 1 minute Default
     Simple_MPU6050& CalibrateMPU(int16_t ax_, int16_t ay_, int16_t az_, int16_t gx_, int16_t gy_, int16_t gz_);
-    Simple_MPU6050& CalibrateMPU(uint8_t Loops = 30);
+    Simple_MPU6050& CalibrateMPU(uint8_t Loops = 30, bool includeGyros = true);
     Simple_MPU6050& Enable_Reload_of_DMP();
     Simple_MPU6050& load_DMP_Image(uint8_t CalibrateMode = 0);
     Simple_MPU6050& load_DMP_Image(int16_t ax_, int16_t ay_, int16_t az_, int16_t gx_, int16_t gy_, int16_t gz_, int8_t Calibrate = 1);

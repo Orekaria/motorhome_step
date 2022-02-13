@@ -14,7 +14,7 @@ enum class DStates {
    NA,
 };
 
-#define MOSFET_PIN 7
+#define MOSFET_PIN 11
 #define SWITCH_CLOSE_PIN 4
 #define SWITCH_OPEN_PIN 5
 #define RELAY_OPEN_PIN 8
@@ -85,8 +85,8 @@ void motionDetection(DStates onOrOff) {
          mpu.Set_DMP_Output_Rate_Hz(10);           // Set the DMP output rate from 200Hz to 5 Minutes.
          //mpu.Set_DMP_Output_Rate_Seconds(10);    // Set the DMP output rate in Seconds
          //mpu.Set_DMP_Output_Rate_Minutes(5);     // Set the DMP output rate in Minute
-         mpu.SetAddress(MPU6050_ADDRESS);          //Sets the address of the MPU.
-         mpu.CalibrateMPU();                       // Calibrates the MPU.
+         mpu.SetAddress(MPU6050_ADDRESS);          // Sets the address of the MPU.
+         mpu.CalibrateMPU(30, false);              // Calibrates the accelerometer but not the gyros because we are disabling them later, to save power
          mpu.load_DMP_Image();                     // Loads the DMP image into the MPU and finish configuration.
          mpu6050.detectMotionSetup();
 
@@ -202,6 +202,8 @@ void doDelayedActions() {
 }
 
 void loop() {
+   powerConsumtion.low();
+
    if (_switchInput == DStates::NA) {
       doDelayedActions();
    } else {

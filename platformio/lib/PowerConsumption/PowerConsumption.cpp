@@ -10,27 +10,27 @@ void PowerConsumption::setCPUSpeed(CPUSpeed newCPUSpeed) {
     if (currentCPUSpeed == newCPUSpeed) {
         return;
     }
-    delay(10);
+    delay(10); // some time to end pending tasks
     CLKPR = 0x80; // enable change in clock frequency
     CLKPR = (uint8_t)newCPUSpeed;
     currentCPUSpeed = newCPUSpeed;
 #ifdef DEBUG
     Serial.begin(SERIAL_SPEED * pow(2, (uint8_t)currentCPUSpeed));
-    Serial.print("Power mode: ");
+    LOG("Power mode: ");
     switch (newCPUSpeed) {
     case CPUSpeed::Mhz4:
-        Serial.print("4Mhz");
+        LOG("4Mhz");
         break;
     case CPUSpeed::Mhz8:
-        Serial.print("8Mhz");
+        LOG("8Mhz");
         break;
     case CPUSpeed::Mhz16:
-        Serial.print("16Mhz");
+        LOG("16Mhz");
         break;
     default:
-        Serial.print("ERROR");
+        LOG("ERROR");
     }
-    Serial.println(" (" + String((uint8_t)currentCPUSpeed) + ")");
+    LOG(" (" + String((uint8_t)currentCPUSpeed) + ")" + CARRIAGE_RETURN);
     if (currentCPUSpeed == CPUSpeed::Mhz16) {
     }
     Serial.flush();
@@ -45,11 +45,12 @@ void PowerConsumption::low() {
     this->setCPUSpeed(CPUSpeed::Mhz8); // most of the time the Arduino is sleeping, where the clock is stopped. Reducing speed, to save very little power, at the cost of responsiveness, does not look like a good idea
 }
 
-uint32_t PowerConsumption::toCPUTime(uint32_t timeToAdjust) {
-    return (uint32_t)(timeToAdjust / (uint8_t)(pow(2, (uint8_t)currentCPUSpeed)));
+unsigned long PowerConsumption::toCPUTime(unsigned long timeToAdjust) {
+    return (unsigned long)(timeToAdjust / (uint8_t)(pow(2, (uint8_t)currentCPUSpeed)));
 }
 
 void PowerConsumption::sleep() {
-    Serial.print("power DOWN" + CARRIAGE_RETURN);
+    LOG("power DOWN" + CARRIAGE_RETURN);
+    delay(10); // some time to end pending tasks
     LowPower.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF);
 }

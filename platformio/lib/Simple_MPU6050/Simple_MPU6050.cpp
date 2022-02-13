@@ -421,8 +421,7 @@ Simple_MPU6050& Simple_MPU6050::load_DMP_Image(int16_t ax_, int16_t ay_, int16_t
 }
 #define CompassCheck(Cnt)   {uint8_t D; Serial.print(F("\n")); Serial.print(Cnt); Serial.print(F(" Read AKM Who am I: ")); Serial.print(I2Cdev::readBytes(0x0C,0,1,&D));Serial.print(F(" Value = 0x"));Serial.println(D);}
 Simple_MPU6050& Simple_MPU6050::load_DMP_Image(uint8_t CalibrateMode) {
-	TestConnection(1);
-	Serial.println();
+	// TestConnection(1);
 	PWR_MGMT_1_WRITE_DEVICE_RESET();				//PWR_MGMT_1:(0x6B Bit7 true) reset with 100ms delay and full SIGNAL_PATH_RESET:(0x6A Bits 3,2,1,0 True) with another 100ms delay
 	MPUi2cWriteByte(0x6B, 0x00);
 	MPUi2cWriteByte(0x6C, 0x00);
@@ -470,18 +469,23 @@ Simple_MPU6050& Simple_MPU6050::CalibrateMPU(int16_t ax_, int16_t ay_, int16_t a
 	return *this;
 }
 
-Simple_MPU6050& Simple_MPU6050::CalibrateMPU(uint8_t Loops) {
-	load_DMP_Image(true);
-	CalibrateAccel(Loops);
-	CalibrateGyro(Loops);
+Simple_MPU6050& Simple_MPU6050::CalibrateMPU(uint8_t Loops, bool includeGyros) {
 	if (!WhoAmI) WHO_AM_I_READ_WHOAMI(&WhoAmI);
 	if (WhoAmI < 0x38) {
 		Serial.println(F("Found MPU6050 or MPU9150"));
+	} else {
+		Serial.println(F("Found MPU6500 or MPU9250"));
+	}
+	load_DMP_Image(true);
+	CalibrateAccel(Loops);
+	if (includeGyros) {
+		CalibrateGyro(Loops);
+	}
+	if (WhoAmI < 0x38) {
 		XA_OFFSET_H_READ_XA_OFFS(&sax_);
 		YA_OFFSET_H_READ_YA_OFFS(&say_);
 		ZA_OFFSET_H_READ_ZA_OFFS(&saz_);
 	} else {
-		Serial.println(F("Found MPU6500 or MPU9250"));
 		XA_OFFSET_H_READ_0x77_XA_OFFS(&sax_);
 		YA_OFFSET_H_READ_0x77_YA_OFFS(&say_);
 		ZA_OFFSET_H_READ_0x77_ZA_OFFS(&saz_);
@@ -713,6 +717,7 @@ bool Simple_MPU6050::view_DMP_firmware_Instance(uint16_t  length) {
 @brief      Fully calibrate Gyro from ZERO in about 6-7 Loops 600-700 readings
 */
 Simple_MPU6050& Simple_MPU6050::CalibrateGyro(uint8_t Loops) {
+	Serial.print("Calibrate Gyro ");
 	double kP = 0.3;
 	double kI = 90;
 	float x;
@@ -720,7 +725,7 @@ Simple_MPU6050& Simple_MPU6050::CalibrateGyro(uint8_t Loops) {
 	kP *= x;
 	kI *= x;
 	PID(0x43, kP, kI, Loops);
-	//Serial.println();
+	Serial.println();
 	return *this;
 }
 
@@ -729,6 +734,7 @@ Simple_MPU6050& Simple_MPU6050::CalibrateGyro(uint8_t Loops) {
 */
 
 Simple_MPU6050& Simple_MPU6050::CalibrateAccel(uint8_t Loops) {
+	Serial.print("Calibrate Accelerator ");
 	float kP = 0.3;
 	float kI = 90;
 	float x;
@@ -736,7 +742,7 @@ Simple_MPU6050& Simple_MPU6050::CalibrateAccel(uint8_t Loops) {
 	kP *= x;
 	kI *= x;
 	PID(0x3B, kP, kI, Loops);
-	//Serial.println();
+	Serial.println();
 	return *this;
 }
 
@@ -803,13 +809,13 @@ Simple_MPU6050& Simple_MPU6050::PID(uint8_t ReadAddress, float kP, float kI, uin
 	return *this;
 }
 Simple_MPU6050& Simple_MPU6050::resetOffset() {
-	Serial.println("Reset Offsets");
+	// Serial.println("Reset Offsets");
 	setOffset(sax_, say_, saz_, sgx_, sgy_, sgz_);
 	return *this; // return Pointer to this class
 }
 
 Simple_MPU6050& Simple_MPU6050::setOffset(int16_t ax_, int16_t ay_, int16_t az_, int16_t gx_, int16_t gy_, int16_t gz_) {
-	Serial.println("set Offsets");
+	// Serial.println("set Offsets");
 	sax_ = ax_;
 	say_ = ay_;
 	saz_ = az_;
