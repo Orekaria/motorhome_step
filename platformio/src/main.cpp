@@ -18,6 +18,9 @@ enum class DStates {
 #define SWITCH_OPEN_PIN 5
 #define RELAY_OPEN_PIN 8
 #define RELAY_CLOSE_PIN 9
+#define RELAY_CLOSED HIGH
+#define RELAY_OPENED LOW
+
 #ifdef DEBUG
 #define STEP_TIME 1000
 #define AUTO_CLOSE_AFTER 7000
@@ -36,8 +39,8 @@ unsigned long startTime;
 unsigned long startTimeAutoClose;
 
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN, MPU_ON_OFF_PIN);
-
 PowerConsumption powerConsumtion = PowerConsumption();
+
 
 void openCloseStep(DStates openOrClose) {
    switch (openOrClose) {
@@ -45,9 +48,9 @@ void openCloseStep(DStates openOrClose) {
       if (!isStepOpened) {
          LOG("openCloseStep OPEN" + CARRIAGE_RETURN);
          isInAction = true;
-         digitalWrite(RELAY_CLOSE_PIN, LOW);
+         digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
          delay(powerConsumtion.toCPUTime(10));
-         digitalWrite(RELAY_OPEN_PIN, HIGH);
+         digitalWrite(RELAY_OPEN_PIN, RELAY_OPENED);
          isStepOpened = true;
          startTime = millis();
          startTimeAutoClose = millis();
@@ -62,8 +65,8 @@ void openCloseStep(DStates openOrClose) {
                   isAutocloseActivated = false;
                   // be sure that the relays are not closed because activating the motion detection is not async and would keep the step in motion
                   // if any relay is closed at this point, the flow of the program is wrong
-                  digitalWrite(RELAY_OPEN_PIN, LOW);
-                  digitalWrite(RELAY_CLOSE_PIN, LOW);
+                  digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
+                  digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
                   mpu6050.motionDetection(MotionDetectionState::ON); // motion activation is activated when the step is permanently extended
                   LOG("isAutocloseActivated false" + CARRIAGE_RETURN);
                }
@@ -77,9 +80,9 @@ void openCloseStep(DStates openOrClose) {
          isInAction = true;
          startTime = millis();
          mpu6050.motionDetection(MotionDetectionState::OFF);
-         digitalWrite(RELAY_OPEN_PIN, LOW);
+         digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
          delay(powerConsumtion.toCPUTime(10));
-         digitalWrite(RELAY_CLOSE_PIN, HIGH);
+         digitalWrite(RELAY_CLOSE_PIN, RELAY_OPENED);
          isStepOpened = false;
          isAutocloseActivated = false;
       }
@@ -108,8 +111,8 @@ void doDelayedActions() {
          LOG("isInAction expired" + CARRIAGE_RETURN);
          isInAction = false;
          // release both relays
-         digitalWrite(RELAY_OPEN_PIN, LOW);
-         digitalWrite(RELAY_CLOSE_PIN, LOW);
+         digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
+         digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
       }
    } else if (isAutocloseActivated) {
       if ((millis() - startTimeAutoClose) > powerConsumtion.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
@@ -173,8 +176,8 @@ void setup() {
    pinMode(RELAY_OPEN_PIN, OUTPUT);
    pinMode(RELAY_CLOSE_PIN, OUTPUT);
 
-   digitalWrite(RELAY_OPEN_PIN, LOW);
-   digitalWrite(RELAY_CLOSE_PIN, LOW);
+   digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
+   digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
 
    digitalWrite(BUZZER_PIN, HIGH);
    delay(powerConsumtion.toCPUTime(50));
