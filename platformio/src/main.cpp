@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Shared.h>
 #include <Mpu6050.h>
-#include <PowerConsumption.h>
+#include <MicrocontrollerState.h>
 
 enum class DStates {
    ON = 0x00,
@@ -39,7 +39,7 @@ unsigned long startTime;
 unsigned long startTimeAutoClose;
 
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN, MPU_ON_OFF_PIN);
-PowerConsumption powerConsumtion = PowerConsumption();
+MicrocontrollerState microcontrollerState = MicrocontrollerState();
 
 
 void openCloseStep(DStates openOrClose) {
@@ -49,7 +49,7 @@ void openCloseStep(DStates openOrClose) {
          LOG("openCloseStep OPEN" + CARRIAGE_RETURN);
          isInAction = true;
          digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
-         delay(powerConsumtion.toCPUTime(10));
+         delay(microcontrollerState.toCPUTime(10));
          digitalWrite(RELAY_OPEN_PIN, RELAY_OPENED);
          isStepOpened = true;
          startTime = millis();
@@ -57,7 +57,7 @@ void openCloseStep(DStates openOrClose) {
          isAutocloseActivated = true;
       } else {
          startTimeAutoClose = millis(); // restart the timer if the open-step switch is pressed again
-         if ((millis() - startTime) > powerConsumtion.toCPUTime(STEP_TIME + 100) && (millis() - startTime < powerConsumtion.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW))) { // ... if the user has pushed the button after the step has just opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
+         if ((millis() - startTime) > microcontrollerState.toCPUTime(STEP_TIME + 100) && (millis() - startTime < microcontrollerState.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW))) { // ... if the user has pushed the button after the step has just opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
             if (isAutocloseActivated) {
                if (isInAction) {
                   LOG("ERROR: the flow is wrong if the step is already in action");
@@ -81,7 +81,7 @@ void openCloseStep(DStates openOrClose) {
          startTime = millis();
          mpu6050.motionDetection(MotionDetectionState::OFF);
          digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
-         delay(powerConsumtion.toCPUTime(10));
+         delay(microcontrollerState.toCPUTime(10));
          digitalWrite(RELAY_CLOSE_PIN, RELAY_OPENED);
          isStepOpened = false;
          isAutocloseActivated = false;
@@ -107,7 +107,7 @@ void checkUserInput() {
 void doDelayedActions() {
    if (isInAction) { // if the step is being opened/closed
       LOG(".");
-      if ((millis() - startTime) > powerConsumtion.toCPUTime(STEP_TIME)) { // ... and the time to open/close has expired
+      if ((millis() - startTime) > microcontrollerState.toCPUTime(STEP_TIME)) { // ... and the time to open/close has expired
          LOG("isInAction expired" + CARRIAGE_RETURN);
          isInAction = false;
          // release both relays
@@ -115,7 +115,7 @@ void doDelayedActions() {
          digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
       }
    } else if (isAutocloseActivated) {
-      if ((millis() - startTimeAutoClose) > powerConsumtion.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
+      if ((millis() - startTimeAutoClose) > microcontrollerState.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
          LOG("isInAction auto-CLOSE" + CARRIAGE_RETURN);
          openCloseStep(DStates::CLOSE);
          isAutocloseActivated = false;
@@ -144,16 +144,16 @@ void loop() {
    }
    _switchInput = DStates::NA;
 
-   delay(powerConsumtion.toCPUTime(100));
+   delay(microcontrollerState.toCPUTime(100));
    LOG("_");
 
    if (!isInAction) {
       digitalWrite(BUZZER_PIN, LOW);
       if (!isAutocloseActivated) {
-         powerConsumtion.low();
-         powerConsumtion.sleep(); // only will wake up by an interruption
+         microcontrollerState.low();
+         microcontrollerState.sleep(); // only will wake up by an interruption
           // the execution continues here after the interruption has been processed
-         powerConsumtion.high();
+         microcontrollerState.high();
       }
       if (mpu6050.isMotionDetected()) {
          digitalWrite(BUZZER_PIN, HIGH);
@@ -165,7 +165,7 @@ void loop() {
 }
 
 void setup() {
-   powerConsumtion.high();
+   microcontrollerState.high();
 
    pinMode(SWITCH_OPEN_PIN, INPUT_PULLUP);
    pinMode(SWITCH_CLOSE_PIN, INPUT_PULLUP);
@@ -180,7 +180,7 @@ void setup() {
    digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
 
    digitalWrite(BUZZER_PIN, HIGH);
-   delay(powerConsumtion.toCPUTime(50));
+   delay(microcontrollerState.toCPUTime(50));
    digitalWrite(BUZZER_PIN, LOW);
 
    // LOW to trigger the interrupt whenever the pin is low,

@@ -1,11 +1,11 @@
-#ifndef PowerConsumption_h
-#define PowerConsumption_h
+#ifndef MicrocontrollerState_h
+#define MicrocontrollerState_h
 
 #include <Arduino.h>
 #include <LowPower.h>
 #include <Shared.h>
 
-class PowerConsumption {
+class MicrocontrollerState {
 
 public:
     enum class CPUSpeed {
@@ -15,8 +15,8 @@ public:
         unknown = 0x99,
     };
     CPUSpeed currentCPUSpeed = CPUSpeed::unknown;
-    PowerConsumption();
-    ~PowerConsumption();
+    MicrocontrollerState();
+    ~MicrocontrollerState();
     void setCPUSpeed(CPUSpeed newCPUSpeed);
     void high();
     void low();
