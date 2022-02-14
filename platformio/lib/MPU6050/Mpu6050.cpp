@@ -27,7 +27,7 @@ bool Mpu6050::isMotionDetected() {
     return b;
 }
 
-unsigned long Mpu6050::toCPUTime(unsigned long t) {
+uint32_t Mpu6050::toCPUTime(uint32_t t) {
     return t;
 }
 

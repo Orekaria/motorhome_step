@@ -45,8 +45,8 @@ void MicrocontrollerState::low() {
     this->setCPUSpeed(CPUSpeed::Mhz8); // most of the time the Arduino is sleeping, where the clock is stopped. Reducing speed, to save very little power, at the cost of responsiveness, does not look like a good idea
 }
 
-unsigned long MicrocontrollerState::toCPUTime(unsigned long timeToAdjust) {
-    return (unsigned long)(timeToAdjust / (uint8_t)(pow(2, (uint8_t)currentCPUSpeed)));
+uint32_t MicrocontrollerState::toCPUTime(uint32_t timeToAdjust) {
+    return (uint32_t)(timeToAdjust / (uint8_t)(pow(2, (uint8_t)currentCPUSpeed)));
 }
 
 void MicrocontrollerState::sleep() {

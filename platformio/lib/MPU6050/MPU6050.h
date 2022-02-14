@@ -11,7 +11,6 @@ enum MotionDetectionState {
     ON,
 };
 
-
 class Mpu6050 {
 private:
     Simple_MPU6050 mpu; // for some reason that I cannot understand now, this object must be instantiated at the begining. If not, the MPU fails to calibrate
@@ -20,7 +19,7 @@ private:
     bool _isSettingUpMotionDetector = false;
     void writeByte(uint8_t address, uint8_t subAddress, uint8_t data);
     uint8_t readByte(uint8_t address, uint8_t subAddress);
-    unsigned long toCPUTime(unsigned long t);
+    uint32_t toCPUTime(uint32_t t);
 public:
     Mpu6050(uint8_t intPin, uint8_t onOffPin);
     ~Mpu6050();

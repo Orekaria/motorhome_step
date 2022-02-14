@@ -35,8 +35,8 @@ volatile bool isAutocloseActivated = false;
 volatile bool isInAction = false;
 volatile bool isStepLocked = false;
 
-unsigned long startTime;
-unsigned long startTimeAutoClose;
+uint32_t startTime;
+uint32_t startTimeAutoClose;
 
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN, MPU_ON_OFF_PIN);
 MicrocontrollerState microcontrollerState = MicrocontrollerState();
