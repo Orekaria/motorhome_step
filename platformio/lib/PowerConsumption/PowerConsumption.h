@@ -1,9 +1,9 @@
+#ifndef PowerConsumption_h
+#define PowerConsumption_h
+
 #include <Arduino.h>
 #include <LowPower.h>
 #include <Shared.h>
-
-#ifndef POWERCONSUMPTION_H
-#define POWERCONSUMPTION_H
 
 class PowerConsumption {
 
