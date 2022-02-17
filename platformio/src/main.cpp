@@ -169,10 +169,29 @@ void loop() {
 void setup() {
    microcontrollerState.high();
 
+   // initialize pins for minimum current consumption
+   // INPUT_PULLUP protects the pins but also can create small current spikes up to 1.1mA if, e.g. the pins are touched
+   // OUTPUT decreases current to minimum
+   uint8_t initialState = OUTPUT;
+   pinMode(0, INPUT);
+   pinMode(1, INPUT);
+   pinMode(13, OUTPUT);
+   for (uint8_t a = 2; a <= 12; a++) {
+      pinMode(a, initialState);
+   }
+   pinMode(A0, initialState);
+   pinMode(A1, initialState);
+   pinMode(A2, initialState);
+   pinMode(A3, initialState);
+   pinMode(A4, initialState);
+   pinMode(A5, initialState);
+   pinMode(A6, initialState);
+   pinMode(A7, initialState);
+
    pinMode(SWITCH_OPEN_PIN, INPUT_PULLUP);
    pinMode(SWITCH_CLOSE_PIN, INPUT_PULLUP);
    pinMode(INTERRUPT_BUTTONS_PIN, INPUT);
-   pinMode(INTERRUPT_MPU6050_PIN, INPUT_PULLUP); // When you set the mode to INPUT_PULLUP, an internal resistor – inside the Arduino board – will be set between the digital pin 4 and VCC (5V). This resistor – value estimated between 20k and 50k Ohm – will make sure the state stays HIGH. When you press the button, the states becomes LOW
+   pinMode(INTERRUPT_MPU6050_PIN, INPUT_PULLUP); // When you set the mode to INPUT_PULLUP, an internal resistor – inside the Arduino board – will be set between the digital pin 4 and VCC. This resistor – value estimated between 20k and 50k Ohm – will make sure the state stays HIGH. When you press the button, the states becomes LOW
 
    pinMode(BUZZER_PIN, OUTPUT);
    pinMode(RELAY_OPEN_PIN, OUTPUT);
