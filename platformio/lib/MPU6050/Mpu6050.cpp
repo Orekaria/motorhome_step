@@ -70,6 +70,9 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff) {
         bool isMotionDetectorPresent = test();
 
         if (isMotionDetectorPresent) {
+            digitalWrite(BUZZER_PIN, HIGH);
+            delay(toCPUTime(50));
+            digitalWrite(BUZZER_PIN, LOW);
             //// MPU-6050
             // Setup the MPU
 #ifdef DEBUG

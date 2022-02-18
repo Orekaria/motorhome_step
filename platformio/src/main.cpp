@@ -148,7 +148,6 @@ void loop() {
    LOG("_");
 
    if (!isInAction) {
-      digitalWrite(BUZZER_PIN, LOW);
       if (!isAutocloseActivated) {
          microcontrollerState.low();
          microcontrollerState.sleep(); // only will wake up by an interruption
@@ -157,6 +156,9 @@ void loop() {
       }
       if (mpu6050.isMotionDetected()) {
          digitalWrite(BUZZER_PIN, HIGH);
+         delay(microcontrollerState.toCPUTime(500));
+         digitalWrite(BUZZER_PIN, LOW);
+         delay(microcontrollerState.toCPUTime(500));
          if (isStepOpened) {
             openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the vehicle is moving
          }
