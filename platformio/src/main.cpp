@@ -13,7 +13,7 @@ enum class DStates {
    NA,
 };
 
-#define MPU_ON_OFF_PIN 11
+#define MPU_ON_OFF_PIN 12
 #define SWITCH_CLOSE_PIN 4
 #define SWITCH_OPEN_PIN 5
 #define RELAY_OPEN_PIN 8
