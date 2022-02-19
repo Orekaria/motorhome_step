@@ -14,23 +14,23 @@
 
 ## Bill of materials
 - Arduino Nano 3
+- 1x switching regulator at 4.1V
 - 2x relays with NC/NO built-in connectors
 - 1x MPU-6050 accelerometer to detect if the vehicle is moving
 - 1x Active buzzer to alarm when the vehicle is moving and the step is being auto-closed
-- 2x Switch regulators to 3.3V and 5V
-- 3x 10k resistors for the interrupt of the buttons and for the I2C channels
-- 2x 1N4007 diodes to join the buttons 1 interrupt
-- 1x IRF520 MOSFET to power off the motion detector when not needed
+- 1x 10k resistors for the interrupt
+- 3x 1N4007 diodes, 1x to block the current from reaching the regulator when connected to USB, 2x diodes to join the buttons 1 interrupt
 - 1x 4700uF capacitor to prevent power drops
 
 ## Low power usage
-  - 3.3V for all but the relays. To switch on and off the 5V relay coils, NPN transistors are used.
-  - The Arduino speed has been reduced from 16Mhz to 8Mhz. 3.3V requires 8Mhz. Also it consumes less power while still being responsive.
-  - The Arduino is put in deep sleep mode unless an interrupt is fired
-  - Interrupts are fired by both buttons and by the motion detector
-  - The motion detector is power off via MOSFET when the step is closed
-  - High efficiency switch regulators for 3.3V and 5V are used
-  - Leds and regulators have been removed
+  - Voltage 3.2V
+  - The Arduino speed has been reduced from 16Mhz to 8Mhz. 3.3V requires 8Mhz. Also it consumes less power
+  - The Arduino is put in deep sleep mode waiting for an interrupt to be fired
+  - Arduino's pins are all set as INPUT/OUTPUT, because INPUT-PULLUP increases current consumption by 50-80nA per pin
+  - Interrupts can be fired by both buttons and by the motion detector
+  - The motion detector is powered via an Arduino GPIO so it can be switched off when not needed (step closed)
+  - High efficiency switch regulator
+  - Power led and regulator have been removed from the Arduino. Power led removed from the MPU
 
 ### How it lowers power usage:
 Arduino is in sleep until an interrupt is fired (button pressed or motion detected)
@@ -42,6 +42,7 @@ MPU-6050 is powered up only when the step is permanently opened using the intern
 - Use an Arduino Pro Micro
 - Use an Arduino Nano 33 IoT
 - Use an ESP32 based board
+- Use a MOSFET to power off the motion detector instead of an Arduino GPIO
 
 ## Breadboard prototype
 ![Schematic](images/breadboard_view1.jpg)

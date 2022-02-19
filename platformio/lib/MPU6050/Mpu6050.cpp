@@ -93,7 +93,7 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff) {
             detectMotionSetup();
             LOG("I2C - time: " + String((millis() - t) / 1000) + CARRIAGE_RETURN);
 
-            attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, FALLING);
+            attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, RISING);
 
             // tell the user that the motion detection is on
             digitalWrite(BUZZER_PIN, HIGH);
