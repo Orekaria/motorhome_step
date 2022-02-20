@@ -189,7 +189,7 @@ void setup() {
    pinMode(A7, initialState);
 
    // When you set the mode to INPUT_PULLUP, an internal resistor – inside the Arduino board – will be set between the digital pin 4 and VCC. This resistor – value estimated between 20k and 50k Ohm – will make sure the state stays HIGH. When you press the button, the states becomes LOW
-   // INPUT_PULLUP increases the current draw by 50-90nA
+   // INPUT_PULLUP increases the current draw by 50-90nA if a diode is not added between the pin and the signal source
    pinMode(SWITCH_OPEN_PIN, INPUT);
    pinMode(SWITCH_CLOSE_PIN, INPUT);
    pinMode(INTERRUPT_BUTTONS_PIN, INPUT);
@@ -206,6 +206,7 @@ void setup() {
    delay(microcontrollerState.toCPUTime(50));
    digitalWrite(BUZZER_PIN, LOW);
 
+   // HIGH to trigger the interrupt whenever the pin is high,
    // LOW to trigger the interrupt whenever the pin is low,
    // CHANGE to trigger the interrupt whenever the pin changes value
    // RISING to trigger when the pin goes from low to high,
