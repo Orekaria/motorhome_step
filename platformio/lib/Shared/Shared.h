@@ -8,7 +8,8 @@
 
 #define INTERRUPT_BUTTONS_PIN 3 // Arduino nano pin 2 and 3 can be selected
 #define INTERRUPT_MPU6050_PIN 2 // pin used for waking up when MPU6050 detects motion
-#define BUZZER_PIN 11 // pin used for waking up
+#define BUZZER_PIN 12           // pin for the buzzer
+#define BUZZER_FREQUENCY 2000
 
 #define MOT_THR_SELECTED 4 // motion is detected when any of the accelerometer messures exceeds these threshold
 #define MOT_DUR_SELECTED 200 // ms that the motion must continue before the interrupt is raised

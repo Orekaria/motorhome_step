@@ -70,9 +70,9 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff) {
         bool isMotionDetectorPresent = test();
 
         if (isMotionDetectorPresent) {
-            digitalWrite(BUZZER_PIN, HIGH);
+            tone(BUZZER_PIN, BUZZER_FREQUENCY);
             delay(toCPUTime(50));
-            digitalWrite(BUZZER_PIN, LOW);
+            noTone(BUZZER_PIN);
             //// MPU-6050
             // Setup the MPU
 #ifdef DEBUG
@@ -96,15 +96,15 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff) {
             attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, RISING);
 
             // tell the user that the motion detection is on
-            digitalWrite(BUZZER_PIN, HIGH);
+            tone(BUZZER_PIN, BUZZER_FREQUENCY);
             delay(toCPUTime(100));
-            digitalWrite(BUZZER_PIN, LOW);
+            noTone(BUZZER_PIN);
         } else {
             digitalWrite(_onOffPin, LOW);
             for (uint8_t i = 0; i < 3; i++) {
-                digitalWrite(BUZZER_PIN, HIGH);
+                tone(BUZZER_PIN, BUZZER_FREQUENCY);
                 delay(toCPUTime(50));
-                digitalWrite(BUZZER_PIN, LOW);
+                noTone(BUZZER_PIN);
                 delay(toCPUTime(50));
             }
         }

@@ -13,7 +13,7 @@ enum class DStates {
    NA,
 };
 
-#define MPU_ON_OFF_PIN 12
+#define MPU_ON_OFF_PIN 11
 #define SWITCH_CLOSE_PIN 4
 #define SWITCH_OPEN_PIN 5
 #define RELAY_OPEN_PIN 8
@@ -155,9 +155,9 @@ void loop() {
          microcontrollerState.high();
       }
       if (mpu6050.isMotionDetected()) {
-         digitalWrite(BUZZER_PIN, HIGH);
+         tone(BUZZER_PIN, BUZZER_FREQUENCY);
          delay(microcontrollerState.toCPUTime(500));
-         digitalWrite(BUZZER_PIN, LOW);
+         noTone(BUZZER_PIN);
          delay(microcontrollerState.toCPUTime(500));
          if (isStepOpened) {
             openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the vehicle is moving
@@ -168,6 +168,12 @@ void loop() {
 
 void setup() {
    microcontrollerState.high();
+
+   pinMode(BUZZER_PIN, OUTPUT);
+
+   tone(BUZZER_PIN, BUZZER_FREQUENCY);
+   delay(microcontrollerState.toCPUTime(50));
+   noTone(BUZZER_PIN);
 
    // initialize pins for minimum current consumption
    // INPUT_PULLUP protects the pins but also can create small current spikes up to 1.1mA if, e.g. the pins are touched
@@ -195,16 +201,11 @@ void setup() {
    pinMode(INTERRUPT_BUTTONS_PIN, INPUT);
    pinMode(INTERRUPT_MPU6050_PIN, INPUT);
 
-   pinMode(BUZZER_PIN, OUTPUT);
    pinMode(RELAY_OPEN_PIN, OUTPUT);
    pinMode(RELAY_CLOSE_PIN, OUTPUT);
 
    digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
    digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
-
-   digitalWrite(BUZZER_PIN, HIGH);
-   delay(microcontrollerState.toCPUTime(50));
-   digitalWrite(BUZZER_PIN, LOW);
 
    // HIGH to trigger the interrupt whenever the pin is high,
    // LOW to trigger the interrupt whenever the pin is low,
@@ -213,10 +214,5 @@ void setup() {
    // FALLING for when the pin goes from high to low.
    attachInterrupt(digitalPinToInterrupt(INTERRUPT_BUTTONS_PIN), checkUserInput, RISING);
 
-#ifdef DEBUG
-   delay(100);
-   mpu6050.motionDetection(MotionDetectionState::ON);
-#else
    openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the arduino is powered up
-#endif
 }
