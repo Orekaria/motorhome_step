@@ -45,8 +45,10 @@ MPU-6050 is powered up only when the step is permanently opened using the intern
 - Use a MOSFET to power off the motion detector instead of an Arduino GPIO
 
 ## Breadboard prototype
-![Schematic](images/breadboard_view1.jpg)
-![Schematic](images/breadboard_view2.jpg)
+![Schematic](images/breadboard.jpg)
+![Schematic](images/all.jpg)
+![Schematic](images/up.jpg)
+![Schematic](images/down.jpg)
 
 ## Links
 
