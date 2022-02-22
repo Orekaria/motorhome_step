@@ -179,8 +179,8 @@ void setup() {
    // INPUT_PULLUP protects the pins but also can create small current spikes up to 1.1mA if, e.g. the pins are touched
    // OUTPUT/INPUT decreases current to minimum: 20nA at 3.2V. 60nA at 3.3V. 88nA at 4V.
    uint8_t initialState = OUTPUT;
-   pinMode(0, INPUT);
-   pinMode(1, INPUT);
+   pinMode(0, INPUT); // RX
+   pinMode(1, INPUT); // TX
    pinMode(13, OUTPUT);
    for (uint8_t a = 2; a <= 12; a++) {
       pinMode(a, initialState);
