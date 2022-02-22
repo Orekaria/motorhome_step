@@ -44,13 +44,13 @@ MPU-6050 is powered up only when the step is permanently opened using the intern
 - Use an ESP32 based board
 - Use a MOSFET to power off the motion detector instead of an Arduino GPIO
 
-## Breadboard prototype
+## Photos
 ![Schematic](images/breadboard.jpg)
 ![Schematic](images/all.jpg)
 ![Schematic](images/up.jpg)
 ![Schematic](images/down.jpg)
 
-## Links
+## Usefull links
 
 I2Cdev: https://www.i2cdevlib.com/usage
 Relay, NPN transistor: https://www.inventable.eu/controlar-rele-con-transistor/
