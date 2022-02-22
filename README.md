@@ -1,6 +1,11 @@
-# Replacement for the Step circuit in a vehicle
+# Vehicle step functionality upgrade
 
-The circuit is basically a microcontroller + motion detector + relay. So, it can be used for a lot of different projects.
+## Description
+Extends the functionality and safety of a step in a vehicle
+
+The step is auto-slided-in by timer or when the vehicle starts moving (because motion has been detected)
+
+The circuit is, essentially, a microcontroller + motion detector + relay with ultra low power requirements. So, it can be extended to a lot of different projects.
 
 ## Instructions
 - Understand how your step/device works
@@ -11,9 +16,9 @@ The circuit is basically a microcontroller + motion detector + relay. So, it can
 - slide-out button: to slide out the step
   - the step will auto-slide-in after 11 seconds
   - if the slide-out button is pushed again within 2 seconds after the step has slided out, the auto-slide-in is disabled. This mode is referred as "step slided out in motion detection mode"
-- slide in button: to retract the step
-- If the vehicle starts moving, an alarm will sound and the step will auto-slide-in
-- The step can be controlled by the user and the arduino indistinctly, thanks to the 2x relay configuration
+- slide-in button: to slide in the step
+- if the vehicle starts moving, an alarm will sound and the step will auto-slide-in
+- the step can be controlled by either the user and the arduino, thanks to the 2x relay configuration
 
 ## Bill of materials
 - Arduino Nano 3
