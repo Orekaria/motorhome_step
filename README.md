@@ -30,14 +30,14 @@ The circuit is, essentially, a microcontroller + motion detector + relay with ul
 - 3x 1N4007 diodes, 1x to block the current from reaching the regulator when connected to USB, 2x diodes to join the buttons 1 interrupt
 - 1x 4700uF capacitor to prevent power drops. Can be much smaller but I liked big
 
-## Low power usage
+## Low power design
 
-### current drain idle
-| state                                    | powered components                    |   µA | A/year |
-| ---------------------------------------- | ------------------------------------- | ---: | -----: |
-| off                                      | switch regulator                      |  220 |   1.90 |
-| on                                       | switch regulator + Arduino            |  260 |   2.25 |
-| step slided out in motion detection mode | switch regulator + Arduino + MPU-6050 |  495 |   4.28 |
+### current/power drain
+| state                                    | powered components                    | µA/hour | Amps/year | Watts/year |
+| ---------------------------------------- | ------------------------------------- | ------: | --------: | ---------: |
+| off                                      | switch regulator                      |     220 |      1.90 |         23 |
+| on                                       | switch regulator + Arduino            |     260 |      2.25 |         29 |
+| step slided out in motion detection mode | switch regulator + Arduino + MPU-6050 |     495 |      4.28 |         56 |
 
 ### how the power is lowered:
 
