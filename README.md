@@ -73,9 +73,10 @@ MPU-6050:
   - Promising library: https://github.com/rambo/I2C. I would like to replace I2Cdev and FastWire with it, if i could find more information and would have a lot more energy to spend in this topic
 
 ## photos
-![Schematic](images/breadboard.jpg)
-![Schematic](images/all.jpg)
-![Schematic](images/up.jpg)
-![Schematic](images/down.jpg)
-![Schematic](images/step.jpg)
-![Schematic](images/button.jpg)
+![all](images/all.jpg)
+![schematic](images/schematic.jpg)
+![breadboard](images/breadboard.jpg)
+![up](images/up.jpg)
+![down](images/down.jpg)
+![step](images/step.jpg)
+![button](images/button.jpg)
