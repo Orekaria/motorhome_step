@@ -74,7 +74,7 @@ MPU-6050:
 
 ## photos
 ![all](images/all.jpg)
-![schematic](images/schematic.jpg)
+![schematic](images/schematic.png)
 ![breadboard](images/breadboard.jpg)
 ![up](images/up.jpg)
 ![down](images/down.jpg)
