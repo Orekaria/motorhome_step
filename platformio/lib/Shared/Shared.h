@@ -11,8 +11,10 @@
 #define BUZZER_PIN 12           // pin for the buzzer
 #define BUZZER_FREQUENCY 2000
 
-#define MOT_THR_SELECTED 4 // motion is detected when any of the accelerometer messures exceeds these threshold
-#define MOT_DUR_SELECTED 200 // ms that the motion must continue before the interrupt is raised
+#define MOT_CALIBRATE false     // calibration true will calibrate the MPU when powered on but will take some seconds
+#define MOT_ENABLE_GYROS false  // activate gyros for enhanced motion detection but it will increase the power consumption by 1.7mA!
+#define MOT_THR_SELECTED 4      // motion is detected when any of the accelerometer messures exceeds these threshold
+#define MOT_DUR_SELECTED 200    // ms that the motion must continue before the interrupt is raised
 
 #ifdef DEBUG
 #define LOG(s) Serial.print(s); Serial.flush();

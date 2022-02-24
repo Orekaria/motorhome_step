@@ -28,7 +28,7 @@ public:
     bool test();
     static void motionDetected();
     bool isMotionDetected();
-    void motionDetection(MotionDetectionState onOrOff);
+    void motionDetection(MotionDetectionState onOrOff, bool calibrate = MOT_CALIBRATE);
 };
 
 #endif

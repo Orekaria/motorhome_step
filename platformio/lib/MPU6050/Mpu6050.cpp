@@ -3,7 +3,7 @@
 Mpu6050::Mpu6050(uint8_t intPin, uint8_t onOffPin) {
     _intPin = intPin;
     _onOffPin = onOffPin;
-    pinMode(_intPin, INPUT_PULLUP); // When you set the mode to INPUT_PULLUP, an internal resistor – inside the Arduino board – will be set between the digital pin 4 and VCC (5V). This resistor – value estimated between 20k and 50k Ohm – will make sure the state stays HIGH. When you press the button, the states becomes LOW
+    pinMode(_intPin, INPUT); // When you set the mode to INPUT_PULLUP, an internal resistor – inside the Arduino board – will be set between the digital pin 4 and VCC (5V). This resistor – value estimated between 20k and 50k Ohm – will make sure the state stays HIGH. When you press the button, the states becomes LOW
     pinMode(_onOffPin, OUTPUT);
     // digitalWrite(_onOffPin, LOW);
 }
@@ -40,23 +40,27 @@ void Mpu6050::detectMotionSetup() {
 #define INT_ENABLE          0x38
 #define INT_STATUS          0x3A
 #define MOT_DETECT_CTRL     0x69 // 2-bit unsigned value. Specifies the additional power-on delay in ms applied to accelerometer data path modules.
-#define PWR_MGMT            0x6B // sleepy time
-#define PWR_GYROS           0x6C // gyros
+#define PWR_MGMT_1          0x6B // sleepy time
+#define PWR_MGMT_2          0x6C // gyros
 
-    // I2Cdev::writeByte(MPU6050_ADDRESS, SIGNAL_PATH_RESET, 0x00); // ?
+    I2Cdev::writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x00);
     I2Cdev::writeByte(MPU6050_ADDRESS, SIGNAL_PATH_RESET, 0x07); // Reset all internal signal paths in the MPU-6050;
     I2Cdev::writeByte(MPU6050_ADDRESS, ACCEL_CONFIG, 0x01); // Write register 28 (==0x1C) to set the Digital High Pass Filter, bits 3:0. For example set it to 0x01 for 5Hz. (These 3 bits are grey in the data sheet, but they are used! Leaving them 0 means the filter always outputs 0.)
     I2Cdev::writeByte(MPU6050_ADDRESS, MOT_THR, MOT_THR_SELECTED); // 8-bit unsigned value. Motion is detected when the absolute value of any of the accelerometer measurements exceeds this Motion detection threshold.
     I2Cdev::writeByte(MPU6050_ADDRESS, MOT_DUR, MOT_DUR_SELECTED); // The Motion detection interrupt is triggered when the Motion detection counter (depending on MOT_THR) reaches the time count in ms, specified in this register.
     I2Cdev::writeByte(MPU6050_ADDRESS, MOT_DETECT_CTRL, 0x15); // write the motion detection decrement and a few other settings (for example write 0x15 to set both free-fall and motion decrements to 1 and accelerometer start-up delay to 5ms total by adding 1ms. )
-    I2Cdev::writeByte(MPU6050_ADDRESS, INT_PIN_CFG, 0x80); // now INT pin is active low (old = A0)
-    I2Cdev::writeByte(MPU6050_ADDRESS, INT_ENABLE, 0x40); // bit 6 (0x40), to enable motion detection interrupt.
-    // deactivate Temp sensor and Gyros to lower power consumption
-    I2Cdev::writeByte(MPU6050_ADDRESS, PWR_MGMT, 8); // 101000 - Cycle & disable TEMP SENSOR
-    I2Cdev::writeByte(MPU6050_ADDRESS, PWR_GYROS, 7); // Disable Gyros
+    I2Cdev::writeByte(MPU6050_ADDRESS, INT_PIN_CFG, 0x8C); // bit 6 (0x40), to enable motion detection interrupt. 0x8C => INT pin is active low
+    I2Cdev::writeByte(MPU6050_ADDRESS, INT_ENABLE, 0x40); // write register 0x38, bit 6 (0x40), to enable motion detection interrupt
+     // deactivate Temp sensor and Gyros to lower power consumption
+    I2Cdev::writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 8); // Cycle & disable TEMP SENSOR
+    if (!MOT_ENABLE_GYROS) {
+        I2Cdev::writeByte(MPU6050_ADDRESS, PWR_MGMT_2, 7); // Disable Gyros
+    }
 }
 
-void Mpu6050::motionDetection(MotionDetectionState onOrOff) {
+
+
+void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
     switch (onOrOff) {
     case MotionDetectionState::ON:
     {
@@ -73,32 +77,37 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff) {
             tone(BUZZER_PIN, BUZZER_FREQUENCY);
             delay(toCPUTime(50));
             noTone(BUZZER_PIN);
-            //// MPU-6050
-            // Setup the MPU
+
+            if (calibrate) {
+                //// MPU-6050
+                // Setup the MPU
 #ifdef DEBUG
-            float t = millis();
+                float t = millis();
 #endif
-            // https://onlinedocs.microchip.com/pr/GUID-EF6FA2F3-5345-4829-9F5D-75388E2EF0C9-en-US-4/index.html?GUID-3BBC8619-26AF-4885-BB0C-D234E30426BD
-            int khz = 400;
-            LOG("I2C- TWBR: " + String(F_CPU / 2000 / khz - 8) + CARRIAGE_RETURN);
-            Fastwire::setup(khz, false);
-            // khz        t
-            // 100     3.62
-            // 400     1.98
-            // mpu.Set_DMP_Output_Rate_Hz(10);        // Set the DMP output rate from 200Hz to 5 Minutes.
-            mpu.Set_DMP_Output_Rate_Seconds(1);       // Set the DMP output rate in Seconds
-            mpu.SetAddress(MPU6050_ADDRESS);          // Sets the address of the MPU.
-            mpu.CalibrateMPU(30, false);              // Calibrates the accelerometer but not the gyros because we are disabling them later, to save power
-            mpu.load_DMP_Image();                     // Loads the DMP image into the MPU and finish configuration.
-            detectMotionSetup();
-            LOG("I2C - time: " + String((millis() - t) / 1000) + CARRIAGE_RETURN);
+                // https://onlinedocs.microchip.com/pr/GUID-EF6FA2F3-5345-4829-9F5D-75388E2EF0C9-en-US-4/index.html?GUID-3BBC8619-26AF-4885-BB0C-D234E30426BD
+                int khz = 400;
+                LOG("I2C- TWBR: " + String(F_CPU / 2000 / khz - 8) + CARRIAGE_RETURN);
+                Fastwire::setup(khz, false);
+                // khz        t
+                // 100     3.62
+                // 400     1.98
+                // mpu.Set_DMP_Output_Rate_Hz(10);        // Set the DMP output rate from 200Hz to 5 Minutes.
+                mpu.Set_DMP_Output_Rate_Seconds(1);       // Set the DMP output rate in Seconds
+                mpu.SetAddress(MPU6050_ADDRESS);          // Sets the address of the MPU.
+                mpu.CalibrateMPU(30, false);              // Calibrates the accelerometer but not the gyros because we are disabling them later, to save power
+                mpu.load_DMP_Image();                     // Loads the DMP image into the MPU and finish configuration.
+                detectMotionSetup(); // TODO: verify that this function is not reseting deleting the DMP image just added
+                LOG("I2C - time: " + String((millis() - t) / 1000) + CARRIAGE_RETURN);
+                tone(BUZZER_PIN, BUZZER_FREQUENCY);
+                delay(toCPUTime(100));
+                noTone(BUZZER_PIN);
+            } else {
+                detectMotionSetup();
+            }
 
             attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, RISING);
 
             // tell the user that the motion detection is on
-            tone(BUZZER_PIN, BUZZER_FREQUENCY);
-            delay(toCPUTime(100));
-            noTone(BUZZER_PIN);
         } else {
             digitalWrite(_onOffPin, LOW);
             for (uint8_t i = 0; i < 3; i++) {
