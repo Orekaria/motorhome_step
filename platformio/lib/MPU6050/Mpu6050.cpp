@@ -58,8 +58,6 @@ void Mpu6050::detectMotionSetup() {
     }
 }
 
-
-
 void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
     switch (onOrOff) {
     case MotionDetectionState::ON:
@@ -74,11 +72,12 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
         bool isMotionDetectorPresent = test();
 
         if (isMotionDetectorPresent) {
-            tone(BUZZER_PIN, BUZZER_FREQUENCY);
-            delay(toCPUTime(50));
-            noTone(BUZZER_PIN);
-
             if (calibrate) {
+                // this will take some time, so communicate to the user that the process has started
+                tone(BUZZER_PIN, BUZZER_FREQUENCY);
+                delay(toCPUTime(100));
+                noTone(BUZZER_PIN);
+
                 //// MPU-6050
                 // Setup the MPU
 #ifdef DEBUG
@@ -96,11 +95,8 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
                 mpu.SetAddress(MPU6050_ADDRESS);          // Sets the address of the MPU.
                 mpu.CalibrateMPU(30, false);              // Calibrates the accelerometer but not the gyros because we are disabling them later, to save power
                 mpu.load_DMP_Image();                     // Loads the DMP image into the MPU and finish configuration.
-                detectMotionSetup(); // TODO: verify that this function is not reseting deleting the DMP image just added
+                detectMotionSetup(); // TODO: verify that this function is not reseting the DMP image just flashed
                 LOG("I2C - time: " + String((millis() - t) / 1000) + CARRIAGE_RETURN);
-                tone(BUZZER_PIN, BUZZER_FREQUENCY);
-                delay(toCPUTime(100));
-                noTone(BUZZER_PIN);
             } else {
                 detectMotionSetup();
             }
@@ -108,6 +104,9 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
             attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, RISING);
 
             // tell the user that the motion detection is on
+            tone(BUZZER_PIN, BUZZER_FREQUENCY);
+            delay(toCPUTime(50));
+            noTone(BUZZER_PIN);
         } else {
             digitalWrite(_onOffPin, LOW);
             for (uint8_t i = 0; i < 3; i++) {
