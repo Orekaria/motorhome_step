@@ -5,6 +5,7 @@
 #include <Shared.h>
 #include <I2Cdev.h>
 #include <Simple_MPU6050.h>
+#include <buzzer.h>
 
 enum MotionDetectionState {
     OFF,

@@ -4,6 +4,7 @@
 #include <Shared.h>
 #include <Mpu6050.h>
 #include <MicrocontrollerState.h>
+#include <buzzer.h>
 
 enum class DStates {
    ON = 0x00,
@@ -13,6 +14,8 @@ enum class DStates {
    NA,
 };
 
+#define BUZZER_PIN 12           // pin for the buzzer
+#define BUZZER_FREQUENCY 2000
 #define MPU_ON_OFF_PIN 11
 #define SWITCH_CLOSE_PIN 4
 #define SWITCH_OPEN_PIN 5
@@ -36,6 +39,7 @@ volatile bool isInAction = false;
 uint32_t startTime;
 uint32_t _lastMotionDetectedTime = UINT32_MAX;
 
+Buzzer buzzer = Buzzer(BUZZER_PIN, BuzzerType::PASSIVE, BUZZER_FREQUENCY);
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN, MPU_ON_OFF_PIN);
 MicrocontrollerState microcontrollerState = MicrocontrollerState();
 
@@ -136,9 +140,7 @@ void loop() {
          if (millis() < _lastMotionDetectedTime + MOT_MIN_INTERVAL) {
             _lastMotionDetectedTime = UINT32_MAX;
             for (uint8_t i = 0; i < 5; i++) {
-               tone(BUZZER_PIN, BUZZER_FREQUENCY);
-               delay(microcontrollerState.toCPUTime(500));
-               noTone(BUZZER_PIN);
+               buzzer.beep(toCPUTime(500));
                delay(microcontrollerState.toCPUTime(500));
             }
             openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the vehicle is moving
@@ -152,11 +154,7 @@ void loop() {
 void setup() {
    microcontrollerState.high();
 
-   pinMode(BUZZER_PIN, OUTPUT);
-
-   tone(BUZZER_PIN, BUZZER_FREQUENCY);
-   delay(microcontrollerState.toCPUTime(50));
-   noTone(BUZZER_PIN);
+   buzzer.beep(toCPUTime(50));
 
    // initialize pins for minimum current consumption
    // INPUT_PULLUP protects the pins but also can create small current spikes up to 1.1mA if, e.g. the pins are touched

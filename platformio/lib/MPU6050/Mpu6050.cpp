@@ -78,9 +78,8 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
         if (isMotionDetectorPresent) {
             if (calibrate) {
                 // this will take some time, so communicate to the user that the process has started
-                tone(BUZZER_PIN, BUZZER_FREQUENCY);
-                delay(toCPUTime(100));
-                noTone(BUZZER_PIN);
+                Buzzer buzzer;
+                buzzer.beep(100);
 
                 //// MPU-6050
                 // Setup the MPU
@@ -109,15 +108,13 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
             attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, RISING);
 
             // tell the user that the motion detection is on
-            tone(BUZZER_PIN, BUZZER_FREQUENCY);
-            delay(toCPUTime(50));
-            noTone(BUZZER_PIN);
+            Buzzer buzzer;
+            buzzer.beep(50);
         } else {
             digitalWrite(_onOffPin, LOW);
+            Buzzer buzzer;
             for (uint8_t i = 0; i < 3; i++) {
-                tone(BUZZER_PIN, BUZZER_FREQUENCY);
-                delay(toCPUTime(50));
-                noTone(BUZZER_PIN);
+                buzzer.beep(50);
                 delay(toCPUTime(50));
             }
         }

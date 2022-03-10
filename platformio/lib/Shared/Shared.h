@@ -8,9 +8,8 @@
 
 #define INTERRUPT_BUTTONS_PIN 3 // Arduino nano pin 2 and 3 can be selected
 #define INTERRUPT_MPU6050_PIN 2 // pin used for waking up when MPU6050 detects motion
-#define BUZZER_PIN 12           // pin for the buzzer
-#define BUZZER_FREQUENCY 2000
 
+// motion detection
 #define MOT_CALIBRATE false               // calibration true will calibrate the MPU when powered on but will take some seconds
 #define MOT_ENABLE_GYROS false            // activate gyros for enhanced motion detection but it will increase the power consumption by 1.7mA!
 // 6, 75  se autoretracta a veces cuando se cierra la puerta o se enciende la nevera
