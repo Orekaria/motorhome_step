@@ -11,9 +11,13 @@ Mpu6050::Mpu6050(uint8_t intPin, uint8_t onOffPin) {
 Mpu6050::~Mpu6050() {
 }
 
-static  bool _isMotionDetected = false;
+volatile bool _isSettingUpMotionDetector = false;
+volatile bool _isMotionDetected = false;
 
 void Mpu6050::motionDetected() {
+    if (_isSettingUpMotionDetector) {
+        return;
+    }
     _isMotionDetected = true;
     LOG("motion detected" + CARRIAGE_RETURN);
 }
@@ -22,7 +26,7 @@ bool Mpu6050::isMotionDetected() {
     if (_isSettingUpMotionDetector) {
         return false;
     }
-    bool b = _isMotionDetected; // reset the status
+    bool b = _isMotionDetected;
     _isMotionDetected = false; // reset the status
     return b;
 }
@@ -101,6 +105,7 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
                 detectMotionSetup();
             }
 
+            _isMotionDetected = false;
             attachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN), motionDetected, RISING);
 
             // tell the user that the motion detection is on
@@ -122,7 +127,7 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
     {
         detachInterrupt(digitalPinToInterrupt(INTERRUPT_MPU6050_PIN));
         delay(toCPUTime(10));
-        digitalWrite(_onOffPin, LOW);
+        digitalWrite(_onOffPin, LOW); // power off the MPU
         _isMotionDetected = false;
         break;
     }
