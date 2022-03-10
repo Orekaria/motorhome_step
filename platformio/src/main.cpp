@@ -30,13 +30,11 @@ enum class DStates {
 #endif
 #define AUTO_CLOSE_DISABLE_WINDOW 2000 // if the open-step switch is pressed within this time after the STEP_TIME, the step is locked in the open position until close-step switch is pressed
 
-volatile bool isStepOpened = true; // assume that the step is opened (extended) when the arduino boots up
-volatile bool isAutocloseActivated = false;
+volatile bool isStepOpened = false;
 volatile bool isInAction = false;
-volatile bool isStepLocked = false;
 
 uint32_t startTime;
-uint32_t startTimeAutoClose;
+uint32_t _lastMotionDetectedTime = UINT32_MAX;
 
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN, MPU_ON_OFF_PIN);
 MicrocontrollerState microcontrollerState = MicrocontrollerState();
@@ -53,24 +51,9 @@ void openCloseStep(DStates openOrClose) {
          digitalWrite(RELAY_OPEN_PIN, RELAY_OPENED);
          isStepOpened = true;
          startTime = millis();
-         startTimeAutoClose = millis();
-         isAutocloseActivated = true;
       } else {
-         startTimeAutoClose = millis(); // restart the timer if the open-step switch is pressed again
-         if ((millis() - startTime) > microcontrollerState.toCPUTime(STEP_TIME + 100) && (millis() - startTime < microcontrollerState.toCPUTime(STEP_TIME + AUTO_CLOSE_DISABLE_WINDOW))) { // ... if the user has pushed the button after the step has just opened, and before the AUTO_CLOSE_DISABLE_WINDOW has passed, lock the step as opened
-            if (isAutocloseActivated) {
-               if (isInAction) {
-                  LOG("ERROR: the flow is wrong if the step is already in action");
-               } else {
-                  isAutocloseActivated = false;
-                  // be sure that the relays are not closed because activating the motion detection is not async and would keep the step in motion
-                  // if any relay is closed at this point, the flow of the program is wrong
-                  digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
-                  digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
-                  mpu6050.motionDetection(MotionDetectionState::ON); // motion activation is activated when the step is permanently extended
-                  LOG("isAutocloseActivated false" + CARRIAGE_RETURN);
-               }
-            }
+         if (isInAction) {
+            LOG("ERROR: the flow is wrong if the step is already in action");
          }
       }
       break;
@@ -84,7 +67,6 @@ void openCloseStep(DStates openOrClose) {
          delay(microcontrollerState.toCPUTime(10));
          digitalWrite(RELAY_CLOSE_PIN, RELAY_OPENED);
          isStepOpened = false;
-         isAutocloseActivated = false;
       }
       break;
    default:
@@ -108,17 +90,14 @@ void doDelayedActions() {
    if (isInAction) { // if the step is being opened/closed
       LOG(".");
       if ((millis() - startTime) > microcontrollerState.toCPUTime(STEP_TIME)) { // ... and the time to open/close has expired
+         // release both relays
          LOG("isInAction expired" + CARRIAGE_RETURN);
          isInAction = false;
-         // release both relays
          digitalWrite(RELAY_OPEN_PIN, RELAY_CLOSED);
          digitalWrite(RELAY_CLOSE_PIN, RELAY_CLOSED);
-      }
-   } else if (isAutocloseActivated) {
-      if ((millis() - startTimeAutoClose) > microcontrollerState.toCPUTime(AUTO_CLOSE_AFTER)) { // if the elapsed time has ended, auto-close the step
-         LOG("isInAction auto-CLOSE" + CARRIAGE_RETURN);
-         openCloseStep(DStates::CLOSE);
-         isAutocloseActivated = false;
+         if (isStepOpened) {
+            mpu6050.motionDetection(MotionDetectionState::ON); // motion activation is activated when the step is permanently extended
+         }
       }
    }
 }
@@ -148,19 +127,23 @@ void loop() {
    LOG("_");
 
    if (!isInAction) {
-      if (!isAutocloseActivated) {
-         microcontrollerState.low();
-         microcontrollerState.sleep(); // only will wake up by an interruption
-          // the execution continues here after the interruption has been processed
-         microcontrollerState.high();
-      }
+      microcontrollerState.low();
+      microcontrollerState.sleep(); // only will wake up by an interruption
+       // the execution continues here after the interruption has been processed
+      microcontrollerState.high();
+
       if (mpu6050.isMotionDetected()) {
-         tone(BUZZER_PIN, BUZZER_FREQUENCY);
-         delay(microcontrollerState.toCPUTime(500));
-         noTone(BUZZER_PIN);
-         delay(microcontrollerState.toCPUTime(500));
-         if (isStepOpened) {
+         if (millis() < _lastMotionDetectedTime + MOT_MIN_INTERVAL) {
+            _lastMotionDetectedTime = UINT32_MAX;
+            for (uint8_t i = 0; i < 5; i++) {
+               tone(BUZZER_PIN, BUZZER_FREQUENCY);
+               delay(microcontrollerState.toCPUTime(500));
+               noTone(BUZZER_PIN);
+               delay(microcontrollerState.toCPUTime(500));
+            }
             openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the vehicle is moving
+         } else {
+            _lastMotionDetectedTime = millis();
          }
       }
    }
@@ -214,5 +197,6 @@ void setup() {
    // FALLING for when the pin goes from high to low.
    attachInterrupt(digitalPinToInterrupt(INTERRUPT_BUTTONS_PIN), checkUserInput, RISING);
 
+   isStepOpened = true; // assume that the step is opened (extended) when the arduino boots up
    openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the arduino is powered up
 }
