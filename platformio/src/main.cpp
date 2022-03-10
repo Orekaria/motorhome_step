@@ -37,7 +37,6 @@ volatile bool isStepOpened = false;
 volatile bool isInAction = false;
 
 uint32_t startTime;
-uint32_t _lastMotionDetectedTime = UINT32_MAX;
 
 Buzzer buzzer = Buzzer(BUZZER_PIN, BuzzerType::PASSIVE, BUZZER_FREQUENCY);
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN, MPU_ON_OFF_PIN);
@@ -103,8 +102,12 @@ void doDelayedActions() {
             mpu6050.motionDetection(MotionDetectionState::ON); // motion activation is activated when the step is permanently extended
          }
       }
+      return;
    }
 }
+
+volatile bool isDetectingMotion = false;
+uint32_t motionReDetectionStartTime;
 
 void loop() {
    if (_switchInput == DStates::NA) {
@@ -131,21 +134,33 @@ void loop() {
    LOG("_");
 
    if (!isInAction) {
-      microcontrollerState.low();
-      microcontrollerState.sleep(); // only will wake up by an interruption
-       // the execution continues here after the interruption has been processed
-      microcontrollerState.high();
+      if (!isDetectingMotion) {
+         microcontrollerState.low();
+         microcontrollerState.sleep(); // only will wake up by an interruption
+          // the execution continues here after an interruption has been triggered
+         microcontrollerState.high();
+      }
 
       if (mpu6050.isMotionDetected()) {
-         if (millis() < _lastMotionDetectedTime + MOT_MIN_INTERVAL) {
-            _lastMotionDetectedTime = UINT32_MAX;
+         if (!isDetectingMotion) {
+            motionReDetectionStartTime = millis();
+            isDetectingMotion = true;
+            LOG("isDetectingMotion = true" + CARRIAGE_RETURN);
+            buzzer.beep(microcontrollerState.toCPUTime(100));
+         } else {
             for (uint8_t i = 0; i < 5; i++) {
-               buzzer.beep(toCPUTime(500));
-               delay(microcontrollerState.toCPUTime(500));
+               buzzer.beep(microcontrollerState.toCPUTime(200));
+               delay(microcontrollerState.toCPUTime(200));
             }
             openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the vehicle is moving
-         } else {
-            _lastMotionDetectedTime = millis();
+            isDetectingMotion = false;
+         }
+      }
+      if (isDetectingMotion) {
+         // stop attempting to detect motion again if the window has expired
+         if (millis() > motionReDetectionStartTime + microcontrollerState.toCPUTime(MOT_MIN_INTERVAL)) {
+            isDetectingMotion = false;
+            LOG("isDetectingMotion = false" + CARRIAGE_RETURN);
          }
       }
    }
@@ -154,7 +169,7 @@ void loop() {
 void setup() {
    microcontrollerState.high();
 
-   buzzer.beep(toCPUTime(50));
+   buzzer.beep(microcontrollerState.toCPUTime(50));
 
    // initialize pins for minimum current consumption
    // INPUT_PULLUP protects the pins but also can create small current spikes up to 1.1mA if, e.g. the pins are touched
