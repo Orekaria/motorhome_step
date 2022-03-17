@@ -109,13 +109,13 @@ void Mpu6050::motionDetection(MotionDetectionState onOrOff, bool calibrate) {
 
             // tell the user that the motion detection is on
             Buzzer buzzer;
-            buzzer.beep(50);
+            buzzer.beep(100);
         } else {
             digitalWrite(_onOffPin, LOW);
             Buzzer buzzer;
             for (uint8_t i = 0; i < 3; i++) {
-                buzzer.beep(50);
-                delay(toCPUTime(50));
+                buzzer.beep(100);
+                delay(toCPUTime(100));
             }
         }
         break;

@@ -14,9 +14,9 @@
 #define MOT_ENABLE_GYROS false            // activate gyros for enhanced motion detection but it will increase the power consumption by 1.7mA!
 // 6, 75  se autoretracta a veces cuando se cierra la puerta o se enciende la nevera
 // 5, 150 no se cierra cuando me pongo en marcha, hasta que no hay algunos baches
-#define MOT_THR_SELECTED (uint8_t) 3      // motion is detected when any of the accelerometer messures exceeds these threshold
-#define MOT_DUR_SELECTED (uint8_t) 100     // ms that the motion must continue before the interrupt is raised
-#define MOT_MIN_INTERVAL (uint32_t) 3000  // in ms, motion has to be detected twice in this period to be counted. filters motions which source is inside the vehicle, e.g. when the frigde turns on or when the door is closed
+#define MOT_THR_SELECTED (uint8_t) 1      // motion is detected when any of the accelerometer messures exceeds these threshold
+#define MOT_DUR_SELECTED (uint8_t) 60     // ms that the motion must continue before the interrupt is raised
+#define MOT_MIN_INTERVAL (uint32_t) 1000  // in ms, motion has to be detected twice in this period to be counted. filters motions which source is inside the vehicle, e.g. when the frigde turns on or when the door is closed
 
 #ifdef DEBUG
 #define LOG(s) Serial.print(s); Serial.flush();
