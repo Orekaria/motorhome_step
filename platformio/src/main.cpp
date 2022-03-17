@@ -38,7 +38,7 @@ volatile bool isInAction = false;
 
 uint32_t startTime;
 
-Buzzer buzzer = Buzzer(BUZZER_PIN, BuzzerType::PASSIVE, BUZZER_FREQUENCY);
+Buzzer buzzer = Buzzer(BUZZER_PIN);
 Mpu6050 mpu6050 = Mpu6050(INTERRUPT_MPU6050_PIN, MPU_ON_OFF_PIN);
 MicrocontrollerState microcontrollerState = MicrocontrollerState();
 
@@ -148,7 +148,7 @@ void loop() {
             LOG("isDetectingMotion = true" + CARRIAGE_RETURN);
             buzzer.beep(microcontrollerState.toCPUTime(100));
          } else {
-            for (uint8_t i = 0; i < 5; i++) {
+            for (uint8_t i = 0; i < 3; i++) {
                buzzer.beep(microcontrollerState.toCPUTime(200));
                delay(microcontrollerState.toCPUTime(200));
             }

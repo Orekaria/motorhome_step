@@ -13,7 +13,8 @@ class Buzzer {
 private:
 public:
    Buzzer();
-   Buzzer(uint8_t intPin, BuzzerType buzzerType, uint16_t frequency);
+   Buzzer(uint8_t intPin, uint16_t frequency);
+   Buzzer(uint8_t intPin);
    ~Buzzer();
    void beep(uint16_t beepTime);
 };

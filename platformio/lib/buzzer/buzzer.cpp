@@ -10,9 +10,16 @@ Buzzer::Buzzer() {
    }
 }
 
-Buzzer::Buzzer(uint8_t buzzerPin, BuzzerType buzzerType, uint16_t frequency) {
+Buzzer::Buzzer(uint8_t buzzerPin) {
    _buzzerPin = buzzerPin;
-   _buzzerType = buzzerType;
+   _buzzerType = BuzzerType::ACTIVE;
+
+   pinMode(_buzzerPin, OUTPUT);
+}
+
+Buzzer::Buzzer(uint8_t buzzerPin, uint16_t frequency) {
+   _buzzerPin = buzzerPin;
+   _buzzerType = BuzzerType::PASSIVE;
    _buzzerFrequency = frequency;
 
    pinMode(_buzzerPin, OUTPUT);
