@@ -17,8 +17,8 @@ enum class DStates {
 #define BUZZER_PIN 12           // pin for the buzzer
 #define BUZZER_FREQUENCY 2000
 #define MPU_ON_OFF_PIN 11
-#define SWITCH_CLOSE_PIN 4
-#define SWITCH_OPEN_PIN 5
+#define SWITCH_CLOSE_PIN 5
+#define SWITCH_OPEN_PIN 4
 #define RELAY_OPEN_PIN 8
 #define RELAY_CLOSE_PIN 9
 #define RELAY_CLOSED HIGH
