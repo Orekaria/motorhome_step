@@ -106,7 +106,7 @@ void doDelayedActions() {
    }
 }
 
-volatile bool isDetectingMotion = false;
+uint8_t motionDetectedCount = MOT_COUNT;
 uint32_t motionReDetectionStartTime;
 
 void loop() {
@@ -134,33 +134,34 @@ void loop() {
    LOG("_");
 
    if (!isInAction) {
-      if (!isDetectingMotion) {
+      if (motionDetectedCount == MOT_COUNT) { // do not sleep when motion has been detected because the millis() is not counting time while sleeping
          microcontrollerState.low();
          microcontrollerState.sleep(); // only will wake up by an interruption
-          // the execution continues here after an interruption has been triggered
+         // the execution continues here after an interruption has been triggered
          microcontrollerState.high();
       }
 
       if (mpu6050.isMotionDetected()) {
-         if (!isDetectingMotion) {
+         if (motionDetectedCount > 1) {
+            // the motion is ignored but counted, until MOT_COUNT has been reached 
+            motionDetectedCount -= 1;
             motionReDetectionStartTime = millis();
-            isDetectingMotion = true;
-            LOG("isDetectingMotion = true" + CARRIAGE_RETURN);
-            buzzer.beep(microcontrollerState.toCPUTime(100));
+            LOG("motionDetectedCount = " + String(motionDetectedCount) + CARRIAGE_RETURN);
+            buzzer.beep(microcontrollerState.toCPUTime(50));
          } else {
             for (uint8_t i = 0; i < 3; i++) {
                buzzer.beep(microcontrollerState.toCPUTime(200));
                delay(microcontrollerState.toCPUTime(200));
             }
             openCloseStep(DStates::CLOSE);  // be sure that the step is closed when the vehicle is moving
-            isDetectingMotion = false;
+            motionDetectedCount = MOT_COUNT;
          }
       }
-      if (isDetectingMotion) {
+      if (motionDetectedCount != MOT_COUNT) {
          // stop attempting to detect motion again if the window has expired
-         if (millis() > motionReDetectionStartTime + microcontrollerState.toCPUTime(MOT_MIN_INTERVAL)) {
-            isDetectingMotion = false;
-            LOG("isDetectingMotion = false" + CARRIAGE_RETURN);
+         if (millis() > motionReDetectionStartTime + microcontrollerState.toCPUTime(MOT_MAX_INTERVAL)) {
+            motionDetectedCount = MOT_COUNT;
+            LOG("motionDetectedCount = " + String(motionDetectedCount) + CARRIAGE_RETURN);
          }
       }
    }
