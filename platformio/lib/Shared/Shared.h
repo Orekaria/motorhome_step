@@ -16,7 +16,7 @@
 // 5, 150 no se cierra cuando me pongo en marcha, hasta que no hay algunos baches
 #define MOT_THR_SELECTED (uint8_t) 1      // motion is detected when any of the accelerometer messures exceeds these threshold
 #define MOT_DUR_SELECTED (uint8_t) 40     // ms that the motion must continue before the interrupt is raised
-#define MOT_MAX_INTERVAL (uint32_t) 1000  // in ms, motion has to be detected twice in this period to be counted. filters motions which source is inside the vehicle, e.g. when the frigde turns on or when the door is closed
+#define MOT_MAX_INTERVAL (uint32_t) 1500  // in ms, motion has to be detected twice in this period to be counted. filters motions which source is inside the vehicle, e.g. when the frigde turns on or when the door is closed
 #define MOT_COUNT (uint8_t) 3             // motion has to be detected this many times inside the MOT_MAX_INTERVAL period
 
 #ifdef DEBUG

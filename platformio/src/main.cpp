@@ -143,11 +143,12 @@ void loop() {
 
       if (mpu6050.isMotionDetected()) {
          if (motionDetectedCount > 1) {
-            // the motion is ignored but counted, until MOT_COUNT has been reached 
+            // the motion is ignored but counted, until MOT_COUNT has been reached
             motionDetectedCount -= 1;
             motionReDetectionStartTime = millis();
             LOG("motionDetectedCount = " + String(motionDetectedCount) + CARRIAGE_RETURN);
-            buzzer.beep(microcontrollerState.toCPUTime(50));
+            // buzzer.beep(microcontrollerState.toCPUTime(50));
+            delay(microcontrollerState.toCPUTime(50));
          } else {
             for (uint8_t i = 0; i < 3; i++) {
                buzzer.beep(microcontrollerState.toCPUTime(200));
